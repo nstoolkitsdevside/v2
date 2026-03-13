@@ -5,333 +5,179 @@
   | | | |___ / ___ \| |  | | | |_| / ___ \|  _ <| |___| |___ 
   |_| |_____/_/   \_\_|  |_| |____/_/   \_\_| \_\_____|_____| -->
 <html lang="en">
-<head>
 
+<head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>NS Toolkit Access</title>
 
-<link rel="icon" type="image/png" href="https://png.pngtree.com/png-clipart/20250104/original/pngtree-bright-blue-glitter-star-png-image_19604661.png">
-
 <style>
-
-*{
-box-sizing:border-box;
-margin:0;
-padding:0;
-font-family:Arial;
-}
-
-body{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:#0d0d0d;
-}
-
-/* LOGIN CARD */
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial; }
+body { height: 100vh; display: flex; justify-content: center; align-items: center; background: #0d0d0d; }
 
 .login-box{
-width:360px;
-padding:40px;
-background:#1b1b1b;
-border-radius:15px;
-text-align:center;
-box-shadow:0 0 25px rgba(0,255,255,0.3);
+  width: 360px; padding: 40px; background: #1b1b1b; border-radius: 15px;
+  text-align: center; box-shadow: 0 0 25px rgba(0,255,255,0.3);
 }
-
-/* TITLE */
 
 .login-box h2{
-color:#00ffff;
-margin-bottom:25px;
-text-shadow:0 0 10px #00ffff;
+  color: #00ffff; margin-bottom: 25px; text-shadow: 0 0 10px #00ffff;
 }
-
-/* INPUT */
 
 .login-box input{
-width:100%;
-padding:12px;
-border-radius:6px;
-border:none;
-margin-bottom:20px;
-font-size:14px;
+  width: 100%; padding: 12px; border-radius: 6px; border: none; margin-bottom: 20px; font-size: 14px;
 }
-
-/* BUTTON */
 
 .login-box button{
-width:100%;
-padding:12px;
-border:none;
-border-radius:6px;
-background:#19d3d3;
-color:#000;
-font-weight:bold;
-cursor:pointer;
-font-size:15px;
-transition:0.2s;
+  width: 100%; padding: 12px; border: none; border-radius: 6px; background: #19d3d3;
+  color: #000; font-weight: bold; cursor: pointer; font-size: 15px; transition: 0.2s;
 }
 
-.login-box button:hover{
-background:#12bcbc;
+.login-box button:hover{ background:#12bcbc; }
+.login-box button:disabled{ opacity:0.5; cursor:not-allowed; }
+
+#status{
+  margin-top:12px; font-weight:bold; display:block; min-height:24px;
+  font-family: 'Courier New', monospace; font-size:14px; text-align:center;
 }
 
-.error{
-color:#ff4d4d;
-margin-top:12px;
-display:none;
+.success{ color:#00ff9c; text-shadow: 0 0 6px #00ff9c; }
+.error{ color:#ff4d4d; text-shadow: 0 0 6px #ff4d4d; }
+
+.glow{
+  display:inline-block;
+  animation: glowText 1s ease-in-out infinite alternate;
 }
 
+@keyframes glowText{
+  0%{ text-shadow: 0 0 2px #00ff9c; color:#00ff9c; }
+  50%{ text-shadow: 0 0 12px #00ff9c, 0 0 20px #00ff9c; color:#00ff9c; }
+  100%{ text-shadow: 0 0 6px #00ff9c; color:#00ff9c; }
+}
+
+.slack-contact{
+  margin-top:15px; 
+  font-size:13px; 
+  color:#00ffff; 
+  text-shadow: 0 0 4px #00ffff;
+  text-align:center; /* Center align */
+  word-wrap: normal; /* Prevent weird wrapping */
+}
+
+.slack-contact a{
+  color:#00ffff; 
+  text-decoration:underline;
+}
+
+.slack-contact span{
+  white-space: nowrap; /* Keep names on a single line */
+}
 </style>
-
 </head>
 
-<body>
+<body oncontextmenu="return false">
 
 <div class="login-box">
+  <h2>NS Toolkit Access</h2>
 
-<h2>NS Toolkit Access</h2>
+  <input type="password" id="password" placeholder="Enter Access Code" onkeypress="if(event.key==='Enter') login()">
+  <button id="loginBtn" onclick="login()">Enter</button>
+  <p id="status"></p>
 
-<input 
-type="password" 
-id="password" 
-placeholder="Enter Access Code"
-onkeypress="if(event.key==='Enter') login()"
->
-
-<button onclick="login()">Enter</button>
-
-<p id="error" class="error">Incorrect Code</p>
-
+  <!-- Slack contact -->
+<p class="slack-contact">
+  Contact us on Slack: 
+  <span style="white-space: nowrap;">
+    Darel Miranda | Morvan Hsu
+  </span>
+</p>
 </div>
 
 <script>
-
-/* =========================
-   SECURITY CONFIG
-========================= */
-
-const HASH_PARTS = [
-"6f8f75d7fe39a8fd",
-"c33cf70125dea56b",
-"9fd10e8f2486afbd",
-"ae9b43ffca612f60"
-];
-
-const HASHED_PASSWORD = HASH_PARTS.join("");
-
-const MAX_ATTEMPTS = 3;
-const COOLDOWN = 5 * 60 * 1000;
-
-/* =========================
-   UTILITIES
-========================= */
+const HASH_PARTS=["6f8f75d7fe39a8fd","c33cf70125dea56b","9fd10e8f2486afbd","ae9b43ffca612f60"];
+const PASSWORD_HASH=HASH_PARTS.join("");
+const MAX_ATTEMPTS=3;
+const COOLDOWN=5*60*1000;
 
 async function sha256(text){
-
-const encoder = new TextEncoder();
-const data = encoder.encode(text);
-
-const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-return Array.from(new Uint8Array(hashBuffer))
-.map(b => b.toString(16).padStart(2,"0"))
-.join("");
-
+  const encoder=new TextEncoder();
+  const data=encoder.encode(text);
+  const hashBuffer=await crypto.subtle.digest("SHA-256",data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,"0")).join("");
 }
 
-/* constant time comparison */
+function safeCompare(a,b){ if(a.length!==b.length) return false; let r=0; for(let i=0;i<a.length;i++){ r|=a.charCodeAt(i)^b.charCodeAt(i); } return r===0; }
 
-function safeCompare(a,b){
+function getAttempts(){ return parseInt(localStorage.getItem("ns_attempts"))||0; }
+function setAttempts(v){ localStorage.setItem("ns_attempts",v); }
+function setLock(){ localStorage.setItem("ns_lock",Date.now()+COOLDOWN); }
+function getLock(){ return parseInt(localStorage.getItem("ns_lock"))||0; }
 
-if(a.length !== b.length) return false;
-
-let result = 0;
-
-for(let i=0;i<a.length;i++){
-
-result |= a.charCodeAt(i) ^ b.charCodeAt(i);
-
+function cooldown(){
+  const lock=getLock();
+  const status=document.getElementById("status");
+  if(!lock) return;
+  let remaining=lock-Date.now();
+  if(remaining<=0){ localStorage.removeItem("ns_lock"); localStorage.removeItem("ns_attempts"); document.getElementById("loginBtn").disabled=false; status.innerText=''; return; }
+  status.className="error"; status.innerText="Too many attempts. Try again in "+Math.ceil(remaining/1000)+"s";
+  document.getElementById("loginBtn").disabled=true;
+  requestAnimationFrame(cooldown);
 }
-
-return result === 0;
-
-}
-
-/* =========================
-   DEVTOOLS DETECTION
-========================= */
-
-function detectDevTools(){
-
-let start = new Date();
-
-debugger;
-
-let end = new Date();
-
-if(end - start > 100){
-
-document.body.innerHTML = "<h1 style='color:red;text-align:center'>Access Blocked</h1>";
-
-}
-
-}
-
-setInterval(detectDevTools,1000);
-
-/* =========================
-   COOLDOWN SYSTEM
-========================= */
-
-function getAttempts(){
-
-return parseInt(localStorage.getItem("ns_attempts")) || 0;
-
-}
-
-function setAttempts(v){
-
-localStorage.setItem("ns_attempts",v);
-
-}
-
-function lockLogin(){
-
-let lockUntil = Date.now() + COOLDOWN;
-
-localStorage.setItem("ns_lock",lockUntil);
-
-}
-
-function getLock(){
-
-return parseInt(localStorage.getItem("ns_lock")) || 0;
-
-}
-
-/* =========================
-   TIMER
-========================= */
-
-function updateCooldown(){
-
-let lock = getLock();
-
-if(!lock) return;
-
-let remaining = lock - Date.now();
-
-if(remaining <= 0){
-
-localStorage.removeItem("ns_lock");
-localStorage.removeItem("ns_attempts");
-
-document.getElementById("error").style.display="none";
-
-document.querySelector("button").disabled=false;
-
-return;
-
-}
-
-let seconds = Math.ceil(remaining/1000);
-
-document.getElementById("error").style.display="block";
-
-document.getElementById("error").innerText =
-"Too many attempts. Try again in " + seconds + "s";
-
-document.querySelector("button").disabled=true;
-
-requestAnimationFrame(updateCooldown);
-
-}
-
-/* =========================
-   LOGIN
-========================= */
 
 async function login(){
-
-let lock = getLock();
-
-if(lock && Date.now() < lock){
-
-updateCooldown();
-
-return;
-
+  const lock=getLock();
+  const status=document.getElementById("status");
+  if(lock && Date.now()<lock){ cooldown(); return; }
+  const input=document.getElementById("password").value;
+  const hash=await sha256(input);
+  if(safeCompare(hash,PASSWORD_HASH)){
+    document.getElementById("loginBtn").disabled=true;
+    sessionStorage.setItem("ns_access","granted");
+    localStorage.removeItem("ns_attempts");
+    await showSuccessSequence();
+    window.location.href="main.html";
+  } else{
+    let attempts=getAttempts()+1;
+    setAttempts(attempts);
+    status.className="error";
+    if(attempts>=MAX_ATTEMPTS){ setLock(); cooldown(); } 
+    else{ status.innerText="Incorrect Code ("+attempts+"/3)"; }
+  }
 }
 
-const input = document.getElementById("password").value;
-
-const hash = await sha256(input);
-
-if(safeCompare(hash,HASHED_PASSWORD)){
-
-sessionStorage.setItem("ns_access","granted");
-
-localStorage.removeItem("ns_attempts");
-
-window.location.href="main.html";
-
-}else{
-
-let attempts = getAttempts() + 1;
-
-setAttempts(attempts);
-
-let error = document.getElementById("error");
-
-if(attempts >= MAX_ATTEMPTS){
-
-lockLogin();
-
-updateCooldown();
-
-}else{
-
-error.style.display="block";
-error.innerText = "Incorrect Code ("+attempts+"/3)";
-
+// Animated success sequence
+async function showSuccessSequence(){
+  const status=document.getElementById("status");
+  const messages=["Checking code...","✔ Verified","Opening NS Toolkit..."];
+  status.className="success";
+  for(let msg of messages){
+    await typeEffect(status,msg,50);
+    await delay(700);
+    status.innerHTML=''; // clear before next
+  }
 }
 
+// Typing effect
+function typeEffect(el,text,speed){
+  return new Promise(resolve=>{
+    let i=0;
+    const interval=setInterval(()=>{
+      el.innerHTML=text.slice(0,i+1).replace(/ /g,'&nbsp;');
+      i++;
+      if(i>=text.length){ clearInterval(interval); resolve(); }
+    },speed);
+  });
 }
 
-}
+// simple delay
+function delay(ms){ return new Promise(res=>setTimeout(res,ms)); }
 
-/* =========================
-   BLOCK INSPECT SHORTCUTS
-========================= */
-
+// Block inspect keys
 document.addEventListener("keydown",function(e){
-
-if(
-e.key==="F12" ||
-(e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key)) ||
-(e.ctrlKey && e.key==="U")
-){
-
-e.preventDefault();
-
-}
-
+  if(e.key==="F12"||(e.ctrlKey && e.shiftKey && ["I","J","C"].includes(e.key))||(e.ctrlKey && e.key==="U")){ e.preventDefault(); }
 });
 
-/* disable right click */
-
-document.addEventListener("contextmenu",e=>e.preventDefault());
-
-/* start cooldown check */
-
-updateCooldown();
-
+cooldown();
 </script>
-
 </body>
 </html>
