@@ -370,6 +370,9 @@ main, .content-wrapper {
     -webkit-user-select: text;
 }
 .back-btn {
+	    position: fixed;
+    top: 20px;
+    left: 20px;
     padding: 14px 0;
     font-size: 1rem;
     font-weight: bold;
@@ -385,3 +388,4 @@ main, .content-wrapper {
     white-space: nowrap; 
     box-sizing: border-box;
 }
+
