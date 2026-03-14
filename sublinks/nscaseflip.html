@@ -9,33 +9,18 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
 <script>
 document.addEventListener("keydown", function(e) {
-  // Block F12 and common shortcuts (Ctrl+Shift+I/J, Ctrl+U)
-  if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
-    e.preventDefault();
-    return false;
-  }
+  // Block F12 and common shortcuts (Ctrl+Shift+I/J, Ctrl+U)
+  if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
+    e.preventDefault();
+    return false;
+  }
 });
-
 document.addEventListener("keydown", function(e) {
-  if (e.ctrlKey && e.shiftKey && e.key === "C") {
-    e.preventDefault();
-  }
+  if (e.ctrlKey && e.shiftKey && e.key === "C") e.preventDefault();
 });
 // Optional: Disable right-click
 document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NS Template Writer</title>
-<link rel="stylesheet" href="../styles/templatewriterstyle.css">
-</head>
-<div style="text-align:center; margin-bottom:15px;">
-       
-    </div>
-<body oncontextmenu="return false;">
-<button class="back-btn" onclick="history.back()">← Go Back</button>
-
 <style>
 /* ---------------- BODY & HEADER ---------------- */
 body{
@@ -87,19 +72,18 @@ body.dark-mode .app-title{
 
 @keyframes glowAnim{
     0% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
-    50% { text-shadow: 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff, 0 0 40px #00bfff; }
-    100% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
-}
-
-/* Pulse animation for typing */
-@keyframes pulseTitle {
-    0% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
     50% { text-shadow: 0 0 15px #00bfff, 0 0 25px #00bfff, 0 0 35px #00bfff, 0 0 45px #00bfff; }
     100% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
 }
 
 .pulse {
     animation: pulseTitle 0.8s ease-in-out;
+}
+
+@keyframes pulseTitle {
+    0% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
+    50% { text-shadow: 0 0 15px #00bfff, 0 0 25px #00bfff, 0 0 35px #00bfff, 0 0 45px #00bfff; }
+    100% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
 }
 
 .app-desc{
@@ -150,6 +134,8 @@ body.dark-mode .app-title{
     font-size:14px;
     color:#007BFF;
 }
+
+/* Back button */
 .back-btn {
        position: fixed;
     top: 20px;
@@ -169,7 +155,8 @@ body.dark-mode .app-title{
     white-space: nowrap; 
     box-sizing: border-box;
 }
-/* ---------------- MAIN AREA ---------------- */
+
+/* Main area */
 .main-wrapper{
     display:flex;
     flex:1;
@@ -208,7 +195,7 @@ body.dark-mode .app-title{
     box-shadow:0 0 15px rgba(0,123,255,0.15);
 }
 
-/* ---------------- COUNTERS ---------------- */
+/* Counters */
 .counter-wrapper{
     display:flex;
     justify-content:flex-end;
@@ -238,39 +225,34 @@ body.dark-mode .app-title{
     100% { background:#ffffffcc; color:#152352; transform: scale(1); }
 }
 
-/* ---------------- DARK MODE ---------------- */
+/* Dark mode */
 body.dark-mode{
     background:#1e1e1e;
     color:#f0f0f0;
 }
-
 body.dark-mode .top-header{
     background:#2c2c2c;
     color:#f0f0f0;
 }
-
 body.dark-mode .inputarea{
     background:#2c2c2c;
     color:#f0f0f0;
     border-color:#555;
 }
-
 body.dark-mode .counter-box{
     background:#333;
     color:#f0f0f0;
     box-shadow:0 2px 6px rgba(0,0,0,0.3);
 }
-
 body.dark-mode .buttons{
     background: linear-gradient(135deg,#0056d2,#007BFF);
     color:white;
 }
-
 body.dark-mode .buttons:hover{
     box-shadow:0 6px 15px rgba(0,123,255,0.3);
 }
 
-/* ---------------- RESPONSIVE ---------------- */
+/* Responsive */
 @media(max-width:1024px){ .inputarea{ height:300px; } }
 @media(max-width:768px){ .main-wrapper{flex-direction:column;} .inputarea{ height:250px; } }
 @media(max-width:480px){ .inputarea{ height:200px; } }
@@ -278,7 +260,6 @@ body.dark-mode .buttons:hover{
 </head>
 
 <body>
-
 <header class="top-header">
     <div class="logo-banner">
         <img src="https://i.imgur.com/fAPRRis.png" alt="NS Template Logo">
@@ -288,6 +269,7 @@ body.dark-mode .buttons:hover{
         Convert your text to UPPER CASE, lower case, Sentence case, Capitalized Case, or aLtErNaTiNg. Copy, clear, and clean text easily.
     </p>
 
+    <!-- Dark Mode Toggle -->
     <div class="theme-toggle-container" id="theme-toggle">
         🌙 Dark Mode
     </div>
@@ -302,7 +284,9 @@ body.dark-mode .buttons:hover{
         <button class="buttons" id="clearBtn">CLEAR</button>
     </div>
 </header>
+
 <button class="back-btn" onclick="history.back()">← Go Back</button>
+
 <main class="main-wrapper">
     <section class="input-section">
         <div class="counter-wrapper">
@@ -310,10 +294,13 @@ body.dark-mode .buttons:hover{
             <div class="counter-box" id="word-count">Words: 0</div>
             <div class="counter-box" id="line-count">Lines: 0</div>
         </div>
-
         <textarea id="text-input" class="inputarea" placeholder="Type or paste your text here..."></textarea>
     </section>
 </main>
+
+<footer style="text-align:center; padding:15px; background-color:#2c3e50; color:white; margin-top:30px; border-radius:5px;">
+    &copy; 2026 NS Toolkits. Made with ❤️ by Morvan Hsu & Darel Miranda.
+</footer>
 
 <script>
 const textarea = document.getElementById("text-input");
@@ -430,9 +417,5 @@ themeBtn.onclick = () => {
 // Init
 updateCounter();
 </script>
-
 </body>
-<footer style="text-align:center; padding:15px; background-color:#2c3e50; color:white; margin-top:30px; border-radius:5px;">
-    &copy; 2026 NS Toolkits. Made with ❤️ by Morvan Hsu & Darel Miranda.
-</footer>
 </html>
