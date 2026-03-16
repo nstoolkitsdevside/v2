@@ -166,14 +166,22 @@ nav a {
 
         .btn:hover { filter: brightness(1.1); }
 
-        #builder {
+			#builder {
             margin-top: 20px;
-            border: 1px solid var(--border-color);
-            padding: 15px;
+            padding: 20px;
             min-height: 100px;
-            background-color: var(--input-bg);
             border-radius: 4px;
+            /* Box Styling from image */
+            background-color: #f8f9fa; /* Light grey background */
+            border: 1px solid #e9ecef; /* Subtle light border */
+            color: #7f8c8d;            /* Grey text color */
         }
+		
+		body.dark-mode #builder {
+        background-color: #1a1a1a;
+        border-color: #333;
+        color: #888;
+    }
 
         .app-title { text-align: center; margin-bottom: 5px; }
         .subtitle { text-align: center; color: #7f8c8d; font-size: 13px; margin-bottom: 30px; }
