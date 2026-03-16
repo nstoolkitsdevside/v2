@@ -205,16 +205,22 @@ details > .features-container {
 
 
 /*  */
+/* --- SPACING FIX --- */
+
 #hidden1 {
-    display: none;                /* hidden by default */
-    flex-direction: row;          
-    flex-wrap: wrap;              
-    gap: 1.5rem;                  
-    margin-top: 1rem;
-    padding: 1rem;
-    background: #f8f9fa;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    /* Adds a 30px gap above the cards to prevent them from touching the top element */
+    margin-top: 10px !important; 
+    
+    /* Ensures everything stays aligned to the left as previously requested */
+    display: none; 
+    justify-content: flex-start !important;
+    align-items: flex-start !important;
+    width: 100%;
+}
+
+/* Optional: If you want space specifically between the white cards themselves */
+.subgroup {
+    margin-bottom: 0px;
 }
 
 .subgroup {
