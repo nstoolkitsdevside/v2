@@ -1,0 +1,110 @@
+<script>
+    // Footer appear on scroll down
+    let lastScroll = 0;
+    const footer = document.getElementById('footer');
+
+    window.addEventListener('scroll', () => {
+        const currentScroll = window.pageYOffset;
+        if (currentScroll > lastScroll) {
+            footer.style.bottom = '0';
+        } else {
+            footer.style.bottom = '-100px';
+        }
+        lastScroll = currentScroll <= 0 ? 0 : currentScroll;
+    });
+
+    // Dark/Light Mode Toggle
+    const modeBtn = document.getElementById('modeToggle');
+    modeBtn.addEventListener('click', () => {
+        document.body.classList.toggle('dark-mode');
+        if(document.body.classList.contains('dark-mode')){
+            modeBtn.textContent = '☀️ Light Mode';
+        } else {
+            modeBtn.textContent = '🌙 Dark Mode';
+        }
+    });
+</script>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    if(sessionStorage.getItem("ns_access") !== "granted") {
+        alert("Access denied! Please enter the access code first.");
+        window.location.href = "index.html"; // login page
+    }
+});
+</script>
+ <script>
+// =========================
+// Session Check for Sublinks
+// =========================
+const IDLE_LIMIT = 60 * 60 * 1000;  // 1 hour
+const SESSION_LIMIT = 8 * 60 * 60 * 1000; // 8 hours
+
+// Function to check session
+function checkSession() {
+    const access = sessionStorage.getItem("ns_access");
+    const loginTimeRaw = sessionStorage.getItem("ns_loginTime");
+    const lastActivityRaw = sessionStorage.getItem("ns_lastActivity");
+    const now = Date.now();
+
+    // Not logged in
+    if (!access) {
+        alert("Please enter the access code first.");
+        window.location.href="../index.html";
+        return;
+    }
+
+    const loginTime = loginTimeRaw ? parseInt(loginTimeRaw) : now;
+    const lastActivity = lastActivityRaw ? parseInt(lastActivityRaw) : now;
+
+    // Max session check (8 hours)
+    if (now - loginTime > SESSION_LIMIT) {
+        sessionStorage.clear();
+        alert("Your session has expired after 8 hours.");
+        window.location.href="../index.html";
+        return;
+    }
+
+    // Idle check (1 hour)
+    if (now - lastActivity > IDLE_LIMIT) {
+        sessionStorage.clear();
+        alert("You have been logged out due to 1 hour of inactivity.");
+        window.location.href="../index.html";
+        return;
+    }
+
+    // Update last activity timestamp on this page
+    sessionStorage.setItem("ns_lastActivity", now);
+}
+
+// Run immediately
+checkSession();
+
+// Check periodically every 30 seconds
+setInterval(checkSession, 30 * 1000);
+
+// Also update lastActivity on any interaction
+["mousemove","keydown","click","scroll","touchstart"].forEach(evt => {
+    document.addEventListener(evt, () => {
+        if (sessionStorage.getItem("ns_access") === "granted") {
+            sessionStorage.setItem("ns_lastActivity", Date.now());
+        }
+    });
+});
+</script>
+  <script>
+document.addEventListener("keydown", function(e) {
+  // Block F12 and common shortcuts (Ctrl+Shift+I/J, Ctrl+U)
+  if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
+    e.preventDefault();
+    return false;
+  }
+});
+
+document.addEventListener("keydown", function(e) {
+  if (e.ctrlKey && e.shiftKey && e.key === "C") {
+    e.preventDefault();
+  }
+});
+// Optional: Disable right-click
+document.addEventListener("contextmenu", e => e.preventDefault());
+</script>
