@@ -3,276 +3,197 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link rel="stylesheet" href="../styles/templatewriterstyle.css">
-<link rel="icon" type="image/png" href="https://png.pngtree.com/png-clipart/20250104/original/pngtree-bright-blue-glitter-star-png-image_19604661.png">
 <title>NS CaseFlip</title>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
-<script>
-document.addEventListener("keydown", function(e) {
-  // Block F12 and common shortcuts (Ctrl+Shift+I/J, Ctrl+U)
-  if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
-    e.preventDefault();
-    return false;
-  }
-});
-document.addEventListener("keydown", function(e) {
-  if (e.ctrlKey && e.shiftKey && e.key === "C") e.preventDefault();
-});
-// Optional: Disable right-click
-document.addEventListener("contextmenu", e => e.preventDefault());
-</script>
+<link rel="icon" type="image/png" href="https://png.pngtree.com/png-clipart/20250104/original/pngtree-bright-blue-glitter-star-png-image_19604661.png">
 <style>
-/* ---------------- BODY & HEADER ---------------- */
-body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background:#f5f5f5;
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
-    transition: background 0.3s, color 0.3s;
-    color: #152352;
-}
+    /* Reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
-.top-header{
-    background:white;
-    padding:25px;
-    text-align:center;
-    border-bottom:1px solid #e5e5e5;
-    transition: background 0.3s, color 0.3s;
-    position: relative;
-}
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        transition: background 0.3s, color 0.3s;
+        background: #f5f6fa;
+        color: #333;
+    }
 
-.logo-banner img{
-    max-width:420px;
-    height:auto;
-    margin-bottom:10px;
-}
+    body.dark-mode {
+        background: #111;
+        color: #ccc;
+    }
 
-/* ---------------- APP TITLE ---------------- */
-.app-title{
-    color:#152352;
-    font-size:32px;
-    margin-bottom:8px;
-    letter-spacing:1px;
-    transition: color 0.3s, text-shadow 0.3s;
-}
+    /* Header */
+    header {
+        background: linear-gradient(90deg, #4e54c8, #8f94fb);
+        color: white;
+        padding: 1rem 2rem;
+        position: sticky;
+        top: 0;
+        z-index: 1000;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: background 0.3s;
+    }
 
-/* Dark Mode Title Glow */
-body.dark-mode .app-title{
-    color:#00bfff;
-    text-shadow:
-        0 0 5px #00bfff,
-        0 0 10px #00bfff,
-        0 0 20px #00bfff,
-        0 0 30px #00bfff,
-        0 0 40px #00bfff;
-    animation: glowAnim 1.8s ease-in-out infinite alternate;
-}
+    body.dark-mode header {
+        background: linear-gradient(90deg, #222, #444);
+    }
 
-@keyframes glowAnim{
-    0% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
-    50% { text-shadow: 0 0 15px #00bfff, 0 0 25px #00bfff, 0 0 35px #00bfff, 0 0 45px #00bfff; }
-    100% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
-}
+    header h1 { font-size: 1.8rem; }
 
-.pulse {
-    animation: pulseTitle 0.8s ease-in-out;
-}
+    /* Dark/Light toggle button */
+    #modeToggle {
+        cursor: pointer;
+        background: #fff;
+        color: #333;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: bold;
+        transition: background 0.3s, color 0.3s;
+    }
 
-@keyframes pulseTitle {
-    0% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
-    50% { text-shadow: 0 0 15px #00bfff, 0 0 25px #00bfff, 0 0 35px #00bfff, 0 0 45px #00bfff; }
-    100% { text-shadow: 0 0 5px #00bfff, 0 0 10px #00bfff, 0 0 20px #00bfff, 0 0 30px #00bfff; }
-}
+    body.dark-mode #modeToggle {
+        background: #333;
+        color: #0ff;
+    }
 
-.app-desc{
-    color:#7f8c8d;
-    font-size:14px;
-    max-width:900px;
-    margin:auto;
-    margin-bottom:20px;
-}
+    main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 2rem;
+        transition: background 0.3s, color 0.3s;
+    }
 
-.button-container{
-    display:flex;
-    justify-content:center;
-    flex-wrap:wrap;
-    gap:12px;
-}
+    .credits-subtext {
+        margin-bottom: 20px;
+        max-width: 600px;
+        text-align: center;
+    }
 
-.buttons{
-    padding:12px 24px;
-    font-size:14px;
-    font-weight:bold;
-    border:none;
-    border-radius:8px;
-    background:linear-gradient(135deg,#007BFF,#0056d2);
-    color:white;
-    cursor:pointer;
-    transition:all .25s ease;
-    min-width:120px;
-}
+    /* Buttons Area */
+    .button-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 30px;
+    }
 
-.buttons:hover{
-    transform:translateY(-2px);
-    box-shadow:0 6px 15px rgba(0,0,0,0.15);
-}
+    .buttons {
+        padding: 10px 18px;
+        font-size: 13px;
+        font-weight: bold;
+        border: none;
+        border-radius: 6px;
+        background: #007BFF;
+        color: white;
+        cursor: pointer;
+        transition: all .25s ease;
+    }
 
-.buttons:active{
-    transform:translateY(0px);
-}
+    .buttons:hover { transform: translateY(-2px); opacity: 0.9; }
 
-.theme-toggle-container{
-    position:absolute;
-    top:20px;
-    right:20px;
-    display:flex;
-    align-items:center;
-    gap:6px;
-    cursor:pointer;
-    font-size:14px;
-    color:#007BFF;
-}
+    /* FIXED BOX STYLING (MATCHING IMAGE 1) */
+    .editor-container {
+        width: 100%;
+        max-width: 1000px;
+        background: #e9e9e9; /* Light gray outer box */
+        border: 1px solid #d1d1d1;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    }
 
-/* Back button */
-.back-btn {
-       position: fixed;
-    top: 20px;
-    left: 20px;
-    padding: 14px 0;
-    font-size: 1rem;
-    font-weight: bold;
-    border: 2px solid #007BFF;
-    border-radius: 8px;
-    background-color: white;
-    color: #007BFF;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    width: 160px;             
-    display: inline-block;
-    text-align: center;
-    white-space: nowrap; 
-    box-sizing: border-box;
-}
+    body.dark-mode .editor-container {
+        background: #1e1e1e;
+        border-color: #333;
+    }
 
-/* Main area */
-.main-wrapper{
-    display:flex;
-    flex:1;
-    gap:20px;
-    padding:20px;
-    box-sizing:border-box;
-    min-height:0;
-}
+    .counter-wrapper {
+        display: flex;
+        justify-content: flex-end;
+        gap: 8px;
+        margin-bottom: 15px;
+    }
 
-.input-section{
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    min-width:0;
-    position:relative;
-}
+    .counter-box {
+        background: #fff;
+        padding: 4px 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 12px;
+        color: #555;
+        font-family: monospace;
+    }
 
-.inputarea{
-    width:100%;
-    height:350px;
-    box-sizing:border-box;
-    font-size:1.1rem;
-    border-radius:12px;
-    padding:15px;
-    overflow-y:auto;
-    background:white;
-    border:3px solid #dee2e6;
-    outline:none;
-    resize:none;
-    color:#152352;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, background 0.3s, color 0.3s;
-}
+    body.dark-mode .counter-box {
+        background: #2d2d2d;
+        color: #0ff;
+        border-color: #444;
+    }
 
-.inputarea:focus{
-    border-color:#007BFF;
-    box-shadow:0 0 15px rgba(0,123,255,0.15);
-}
+    .inputarea {
+        width: 100%;
+        height: 400px;
+        box-sizing: border-box;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        padding: 20px;
+        background: #f9f9f9; /* Slightly off-white inner */
+        border: 1px solid #ccc;
+        outline: none;
+        resize: vertical;
+        color: #333;
+        font-family: 'Courier New', Courier, monospace;
+    }
 
-/* Counters */
-.counter-wrapper{
-    display:flex;
-    justify-content:flex-end;
-    gap:10px;
-    margin-bottom:8px;
-    flex-wrap:wrap;
-}
+    body.dark-mode .inputarea {
+        background: #121212;
+        color: #ddd;
+        border-color: #444;
+    }
 
-.counter-box{
-    background:#ffffffcc;
-    padding:6px 12px;
-    border-radius:6px;
-    font-size:14px;
-    color:#152352;
-    box-shadow:0 2px 6px rgba(0,0,0,0.1);
-    font-family:monospace;
-    transition: background 0.3s, color 0.3s, transform 0.15s;
-}
+    /* Footer */
+    footer {
+        background: #222;
+        color: #ccc;
+        text-align: center;
+        padding: 1rem;
+        width: 100%;
+    }
 
-.counter-box.animate{
-    animation: highlightAnim 0.6s ease forwards;
-}
+    @keyframes highlightAnim{
+        0% { background:#007BFF; color:white; }
+        100% { background:#fff; color:#555; }
+    }
+    .counter-box.animate { animation: highlightAnim 0.6s ease; }
+nav a { color: white; text-decoration: none; margin-left: 1.5rem; font-weight: 500; position: relative; } nav a::after { content: ''; display: block; height: 2px; background: white; width: 0%; transition: 0.3s; position: absolute; bottom: -4px; left: 0; } nav a:hover::after { width: 100%; }
 
-@keyframes highlightAnim{
-    0% { background:#007BFF; color:white; transform: scale(1.1); }
-    50% { background:#3399FF; color:white; transform: scale(1.05); }
-    100% { background:#ffffffcc; color:#152352; transform: scale(1); }
-}
-
-/* Dark mode */
-body.dark-mode{
-    background:#1e1e1e;
-    color:#f0f0f0;
-}
-body.dark-mode .top-header{
-    background:#2c2c2c;
-    color:#f0f0f0;
-}
-body.dark-mode .inputarea{
-    background:#2c2c2c;
-    color:#f0f0f0;
-    border-color:#555;
-}
-body.dark-mode .counter-box{
-    background:#333;
-    color:#f0f0f0;
-    box-shadow:0 2px 6px rgba(0,0,0,0.3);
-}
-body.dark-mode .buttons{
-    background: linear-gradient(135deg,#0056d2,#007BFF);
-    color:white;
-}
-body.dark-mode .buttons:hover{
-    box-shadow:0 6px 15px rgba(0,123,255,0.3);
-}
-
-/* Responsive */
-@media(max-width:1024px){ .inputarea{ height:300px; } }
-@media(max-width:768px){ .main-wrapper{flex-direction:column;} .inputarea{ height:250px; } }
-@media(max-width:480px){ .inputarea{ height:200px; } }
 </style>
 </head>
-
 <body>
-<header class="top-header">
-    <div class="logo-banner">
-        <img src="https://i.imgur.com/fAPRRis.png" alt="NS Template Logo">
-    </div>
-    <h1 class="app-title">NS CaseFlip</h1>
-    <p class="app-desc">
-        Convert your text to UPPER CASE, lower case, Sentence case, Capitalized Case, or aLtErNaTiNg. Copy, clear, and clean text easily.
-    </p>
 
-    <!-- Dark Mode Toggle -->
-    <div class="theme-toggle-container" id="theme-toggle">
-        🌙 Dark Mode
-    </div>
+<header>
+    <h1>NS Toolkits</h1>
+    <nav>
+<a href="https://nstoolkits.site/main.html">Home</a>
+    </nav>
+    <button id="modeToggle">🌙 Dark Mode</button>
+</header>
+
+<main>
+    <h2 style="margin-bottom:10px;">NS CaseFlip</h2>
+    <p class="credits-subtext">
+        A tool may ease the work, but it cannot replace the craftsman.
+    </p>
 
     <div class="button-container">
         <button class="buttons" id="upperBtn">UPPER CASE</button>
@@ -283,23 +204,19 @@ body.dark-mode .buttons:hover{
         <button class="buttons" id="copyBtn">COPY</button>
         <button class="buttons" id="clearBtn">CLEAR</button>
     </div>
-</header>
 
-<button class="back-btn" onclick="history.back()">← Go Back</button>
-
-<main class="main-wrapper">
-    <section class="input-section">
+    <div class="editor-container">
         <div class="counter-wrapper">
             <div class="counter-box" id="char-count">Characters: 0</div>
             <div class="counter-box" id="word-count">Words: 0</div>
             <div class="counter-box" id="line-count">Lines: 0</div>
         </div>
         <textarea id="text-input" class="inputarea" placeholder="Type or paste your text here..."></textarea>
-    </section>
+    </div>
 </main>
 
-<footer style="text-align:center; padding:15px; background-color:#2c3e50; color:white; margin-top:30px; border-radius:5px;">
-    &copy; 2026 NS Toolkits. Made with ❤️ by Morvan Hsu & Darel Miranda.
+<footer id="footer">
+    &copy; 2026 NS Tool Kits | Made by Morvan Hsu and Darel Miranda
 </footer>
 
 <script>
@@ -307,8 +224,7 @@ const textarea = document.getElementById("text-input");
 const charBox = document.getElementById("char-count");
 const wordBox = document.getElementById("word-count");
 const lineBox = document.getElementById("line-count");
-const themeBtn = document.getElementById("theme-toggle");
-const title = document.querySelector(".app-title");
+const modeBtn = document.getElementById('modeToggle');
 
 let prevChars = 0, prevWords = 0, prevLines = 0;
 
@@ -318,31 +234,21 @@ function animateBox(box){
     box.classList.add("animate");
 }
 
-function pulseTitle(){
-    title.classList.remove("pulse");
-    void title.offsetWidth;
-    title.classList.add("pulse");
-}
-
 function updateCounter(){
     const text = textarea.value;
     const chars = text.length;
     const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
     const lines = text.trim() === "" ? 0 : text.split(/\r\n|\r|\n/).length;
 
-    if(chars>prevChars) animateBox(charBox);
-    if(words>prevWords) animateBox(wordBox);
-    if(lines>prevLines) animateBox(lineBox);
+    if(chars > prevChars) animateBox(charBox);
+    if(words > prevWords) animateBox(wordBox);
+    if(lines > prevLines) animateBox(lineBox);
 
     prevChars = chars; prevWords = words; prevLines = lines;
 
     charBox.innerText = `Characters: ${chars}`;
     wordBox.innerText = `Words: ${words}`;
     lineBox.innerText = `Lines: ${lines}`;
-
-    if(document.body.classList.contains("dark-mode") && chars>0){
-        pulseTitle();
-    }
 }
 
 textarea.addEventListener("input", updateCounter);
@@ -368,36 +274,19 @@ function toAlternating(){
     updateCounter(); 
 }
 
-// Copy with button status
 function copyText() {
     if (!textarea.value) return;
     const copyBtn = document.getElementById("copyBtn");
     navigator.clipboard.writeText(textarea.value).then(() => {
         const originalText = copyBtn.innerText;
         copyBtn.innerText = "Copied!";
-        copyBtn.disabled = true;
-        setTimeout(() => {
-            copyBtn.innerText = originalText;
-            copyBtn.disabled = false;
-        }, 1500);
-    }).catch(() => {
-        copyBtn.innerText = "Failed!";
-        setTimeout(() => copyBtn.innerText = "COPY", 1500);
+        setTimeout(() => copyBtn.innerText = originalText, 1500);
     });
 }
 
-// Clear with button status
 function clearText() {
     textarea.value = "";
     updateCounter();
-    const clearBtn = document.getElementById("clearBtn");
-    const originalText = clearBtn.innerText;
-    clearBtn.innerText = "Cleared!";
-    clearBtn.disabled = true;
-    setTimeout(() => {
-        clearBtn.innerText = originalText;
-        clearBtn.disabled = false;
-    }, 1500);
 }
 
 document.getElementById("upperBtn").onclick = toUpper;
@@ -408,13 +297,11 @@ document.getElementById("altBtn").onclick = toAlternating;
 document.getElementById("copyBtn").onclick = copyText;
 document.getElementById("clearBtn").onclick = clearText;
 
-// Dark mode toggle
-themeBtn.onclick = () => {
-    document.body.classList.toggle("dark-mode");
-    themeBtn.innerText = document.body.classList.contains("dark-mode") ? "☀ Light Mode" : "🌙 Dark Mode";
-};
+modeBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    modeBtn.textContent = document.body.classList.contains('dark-mode') ? '☀️ Light Mode' : '🌙 Dark Mode';
+});
 
-// Init
 updateCounter();
 </script>
 </body>
