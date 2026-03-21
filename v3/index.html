@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NS Toolkits v3</title>
+ <link rel="icon" type="image/jpg" href="https://i.imgur.com/QWLMgK8.jpeg">
+<style>
+:root{
+    --bg:#0b0b0b;
+    --card:rgba(255,255,255,0.05);
+    --accent:#f6c90e;
+    --text:#fff;
+}
+
+/* BACKGROUND */
+body{
+    margin:0;
+    font-family:'Segoe UI',sans-serif;
+    background: radial-gradient(circle at top, #1a1a1a 0%, #0b0b0b 60%);
+    color:var(--text);
+}
+
+/* PARTICLES */
+canvas{
+    position:fixed;
+    top:0;
+    left:0;
+    z-index:-1;
+}
+
+/* NAVBAR */
+.navbar{
+    width:100%;
+    background:rgba(20,20,20,0.6);
+    backdrop-filter: blur(12px);
+    border-bottom:1px solid rgba(246,201,14,0.15);
+}
+
+.nav-inner{
+    max-width:1100px;
+    margin:0 auto;
+    padding:14px 20px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+}
+
+/* LEFT */
+.nav-left{
+    display:flex;
+    align-items:center;
+}
+
+/* CENTER MENU (true center) */
+.nav-menu{
+    display:flex;
+    gap:28px;
+    position:absolute;
+    left:50%;
+    transform:translateX(-50%);
+}
+
+/* RIGHT */
+.nav-right{
+    display:flex;
+    align-items:center;
+}
+
+.nav-left h1{
+    margin:0;
+    font-size:20px;
+    color:var(--accent);
+    letter-spacing:1px;
+}
+
+/* MENU */
+.nav-menu{
+    justify-self:center;
+    display:flex;
+    gap:28px;
+}
+
+.nav-menu a{
+    color:#e6e6e6;
+    text-decoration:none;
+    font-size:14px;
+    opacity:0.8;
+    transition:0.3s;
+    position:relative;
+}
+
+.nav-menu a:hover{
+    color:var(--accent);
+    opacity:1;
+}
+
+.nav-menu a::after{
+    content:'';
+    position:absolute;
+    left:0;
+    bottom:-5px;
+    width:0%;
+    height:2px;
+    background:var(--accent);
+    transition:0.3s;
+}
+
+.nav-menu a:hover::after{
+    width:100%;
+}
+
+/* NAV BUTTON */
+.nav-right button{
+    background:linear-gradient(135deg,#f6c90e,#d4a800);
+    color:#111;
+    border:none;
+    padding:8px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    box-shadow:0 0 10px rgba(246,201,14,0.4);
+    transition:0.3s;
+}
+
+.nav-right button:hover{
+    transform:scale(1.05);
+    box-shadow:0 0 16px rgba(246,201,14,0.7);
+}
+
+/* RESPONSIVE */
+@media(max-width:768px){
+    .nav-menu{ display:none; }
+}
+
+/* CONTAINER */
+.container{
+    max-width:1100px;
+    margin:0 auto;
+    padding:40px 20px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}
+
+/* HERO */
+.hero-title{
+    font-size:52px;
+    font-weight:700;
+    text-align:center;
+    margin-bottom:10px;
+
+    background:linear-gradient(90deg,#ffffff,#f6c90e);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+	filter: drop-shadow(0 0 10px rgba(246,201,14,0.6));
+
+    /* GLOW EFFECT */
+    text-shadow:
+        0 0 5px rgba(246,201,14,0.6),
+        0 0 10px rgba(246,201,14,0.5),
+        0 0 20px rgba(246,201,14,0.4),
+        0 0 40px rgba(246,201,14,0.3);
+
+    animation: glowPulse 2.5s ease-in-out infinite;
+}
+
+.hero-sub{
+    text-align:center;
+    opacity:0.7;
+    font-style:italic;
+    max-width:600px;
+    line-height:1.6;
+}
+
+/* CAROUSEL */
+.carousel-container{
+    perspective:1800px;
+    margin-top:50px;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+}
+
+.carousel{
+    width:360px;
+    height:220px;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:transform 1s cubic-bezier(.2,.8,.2,1);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+/* CARD */
+.card{
+    position:absolute;
+    width:260px;
+    height:180px;
+    border-radius:20px;
+    background:rgba(255,255,255,0.05);
+    backdrop-filter:blur(14px);
+    border:1px solid rgba(255,255,255,0.08);
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    transition:0.4s;
+    box-shadow:0 10px 40px rgba(0,0,0,.6);
+    text-align:center;
+}
+
+/* LINK WRAPPER */
+.card a{
+    text-decoration:none;
+    color:inherit;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+    width:100%;
+    height:100%;
+}
+
+/* ICON */
+.icon{
+    width:44px;
+    height:44px;
+    margin-bottom:10px;
+    transition:0.3s;
+    filter: drop-shadow(0 0 8px rgba(246,201,14,0.6));
+}
+
+/* TEXT */
+.card h3{
+    color:var(--accent);
+    margin:5px 0;
+    font-size:16px;
+}
+
+.card span{
+    font-size:13px;
+    opacity:.7;
+}
+
+/* ACTIVE CARD */
+.card.active{
+    transform:scale(1.25) translateZ(40px) !important;
+    box-shadow:0 0 35px rgba(246,201,14,0.8);
+    border:1px solid rgba(246,201,14,0.4);
+}
+
+/* HOVER */
+.card:hover{
+    transform:translateY(-8px) scale(1.05);
+}
+
+.card:hover .icon{
+    transform:scale(1.2);
+    filter: drop-shadow(0 0 14px rgba(246,201,14,1));
+}
+
+/* CONTROLS */
+.controls{
+    margin-top:30px;
+    display:flex;
+    gap:15px;
+}
+
+button{
+    background:linear-gradient(135deg,#f6c90e,#d4a800);
+    border:none;
+    padding:10px 16px;
+    border-radius:20px;
+    cursor:pointer;
+    color:#111;
+    font-weight:500;
+    box-shadow:0 4px 15px rgba(0,0,0,0.4);
+    transition:0.3s;
+}
+
+button:hover{
+    transform:translateY(-2px);
+    box-shadow:0 6px 20px rgba(246,201,14,0.4);
+}
+
+/* GRID */
+.tool-grid{
+    margin-top:20px;
+    display:flex;
+    gap:20px;
+    flex-wrap:wrap;
+    justify-content:center;
+}
+
+.tool-card{
+    width:200px;
+    background:rgba(255,255,255,0.05);
+    padding:20px;
+    border-radius:12px;
+    text-align:center;
+    transition:0.3s;
+    border:1px solid rgba(255,255,255,0.08);
+}
+
+.tool-card:hover{
+    transform:translateY(-6px);
+    box-shadow:0 12px 30px rgba(0,0,0,0.5);
+    border-color:rgba(246,201,14,0.3);
+}
+
+/* FOOTER */
+footer{
+    margin-top:40px;
+    opacity:.5;
+    text-align:center;
+}
+
+/* MODAL */
+.modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.8);
+    display:none;
+    justify-content:center;
+    align-items:center;
+}
+
+.modal-content{
+    background:#111;
+    padding:30px;
+    border-radius:20px;
+    width:300px;
+    text-align:center;
+}
+@keyframes glowPulse{
+    0%{
+        text-shadow:
+            0 0 5px rgba(246,201,14,0.4),
+            0 0 10px rgba(246,201,14,0.3),
+            0 0 20px rgba(246,201,14,0.2);
+    }
+    50%{
+        text-shadow:
+            0 0 10px rgba(246,201,14,0.9),
+            0 0 25px rgba(246,201,14,0.7),
+            0 0 45px rgba(246,201,14,0.5);
+    }
+    100%{
+        text-shadow:
+            0 0 5px rgba(246,201,14,0.4),
+            0 0 10px rgba(246,201,14,0.3),
+            0 0 20px rgba(246,201,14,0.2);
+    }
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- NAVBAR -->
+<div class="navbar">
+    <div class="nav-inner">
+
+        <div class="nav-left">
+            <h1>NS Toolkits</h1>
+        </div>
+
+        <div class="nav-menu">
+            <a href="index.html">Home</a>
+            <a href="tools.html">Tools</a>
+            <a href="about.html">About</a>
+            <a href="team.html">Team</a>
+        </div>
+
+    </div>
+</div>
+
+<div class="container">
+
+    <div class="hero-title">NS ToolKits v3</div>
+
+    <div class="hero-sub">
+        "A tool may ease the work, but it cannot replace the craftsman. Diligent proofing is the final step to perfection."
+    </div>
+
+    <!-- CAROUSEL -->
+    <div class="carousel-container">
+        <div class="carousel" id="carousel">
+
+            <div class="card">
+                <a href="template-writer.html">
+                    <img class="icon" src="https://img.icons8.com/fluency/96/edit.png">
+                    <h3>Template Writer</h3>
+                    <span>Generator</span>
+                </a>
+            </div>
+
+            <div class="card">
+                <a href="template-lite.html">
+                    <img class="icon" src="https://img.icons8.com/fluency/96/flash-on.png">
+                    <h3>Template Lite</h3>
+                    <span>Lite Tool</span>
+                </a>
+            </div>
+
+            <div class="card">
+                <a href="extractor.html">
+                    <img class="icon" src="https://img.icons8.com/fluency/96/clean.png">
+                    <h3>Extractor</h3>
+                    <span>Cleaner</span>
+                </a>
+            </div>
+
+            <div class="card">
+                <a href="caseflip.html">
+                    <img class="icon" src="https://img.icons8.com/fluency/96/abc.png">
+                    <h3>CaseFlip</h3>
+                    <span>Converter</span>
+                </a>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="rotate(-1)">⬅</button>
+        <button onclick="rotate(1)">➡</button>
+    </div>
+
+    <div class="section-title">THE CRAFTSMEN</div>
+
+    <div class="tool-grid">
+        <div class="tool-card">
+            <h4>Morvan Hsu</h4>
+            <small>Developer</small>
+        </div>
+
+        <div class="tool-card">
+            <h4>Darel Miranda</h4>
+            <small>Developer</small>
+        </div>
+
+        <div class="tool-card">
+            <h4>Our Team</h4>
+            <small>For Beta Testing</small>
+        </div>
+    </div>
+
+    <footer>© 2026 NS Tool Kits v3 | Made by Morvan Hsu and Darel Miranda</footer>
+
+</div>
+
+<div class="modal" id="modal">
+    <div class="modal-content">
+        <h2 id="modalTitle"></h2>
+        <p id="modalDesc"></p>
+        <button onclick="closeModal()">Close</button>
+    </div>
+</div>
+
+<script>
+const carousel = document.getElementById('carousel');
+const cards = document.querySelectorAll('.card');
+
+let current = 0;
+const total = cards.length;
+const theta = 360 / total;
+const radius = 320;
+
+/* =========================
+   UPDATE RENDER
+========================= */
+function update(){
+    cards.forEach((card,i)=>{
+        let angle = theta * (i + current);
+        let normalized = (i + current) % total;
+        if(normalized < 0) normalized += total;
+
+        let isActive = normalized === 0;
+
+        // stronger depth + zoom effect
+        let scale = isActive ? 1.35 : 1;
+
+        card.style.transform = `
+            rotateY(${angle}deg)
+            translateZ(${radius}px)
+            scale(${scale})
+        `;
+
+        card.classList.remove("active");
+
+        if(isActive){
+            card.classList.add("active");
+
+            // glow intensity boost
+            card.style.boxShadow = "0 0 50px rgba(246,201,14,0.9)";
+        } else {
+            card.style.boxShadow = "0 10px 40px rgba(0,0,0,.6)";
+        }
+    });
+}
+
+function rotate(dir){
+    current += dir;
+    update();
+}
+
+update();
+
+/* =========================
+   AUTO ROTATE
+========================= */
+let autoRotate = setInterval(()=>rotate(1),4000);
+
+/* =========================
+   PHYSICS SETTINGS
+========================= */
+let isDragging = false;
+let lastX = 0;
+let velocity = 0;
+let animationFrame;
+
+const friction = 0.88;
+const sensitivity = 0.005;
+const snapStrength = 0.1;
+
+/* =========================
+   SNAP TO CENTER
+========================= */
+function snapToNearest(){
+    let snapped = Math.round(current);
+    let diff = snapped - current;
+
+    function animateSnap(){
+        if(Math.abs(diff) < 0.001){
+            current = snapped;
+            update();
+            autoRotate = setInterval(()=>rotate(1),4000);
+            return;
+        }
+
+        current += diff * snapStrength;
+        diff = snapped - current;
+
+        update();
+        requestAnimationFrame(animateSnap);
+    }
+
+    animateSnap();
+}
+
+/* =========================
+   DRAG START
+========================= */
+carousel.addEventListener("mousedown", (e) => {
+    isDragging = true;
+    lastX = e.clientX;
+    velocity = 0;
+    clearInterval(autoRotate);
+});
+
+/* =========================
+   DRAG MOVE
+========================= */
+window.addEventListener("mousemove", (e) => {
+    if(!isDragging) return;
+
+    let delta = e.clientX - lastX;
+
+    // velocity-based rotation speed
+    velocity = delta;
+
+    // cinematic sensitivity scaling
+    let speedFactor = Math.min(Math.abs(delta) * 0.002, 2);
+
+    current += delta * sensitivity * speedFactor;
+
+    update();
+    lastX = e.clientX;
+});
+
+/* =========================
+   DRAG END + MOMENTUM
+========================= */
+window.addEventListener("mouseup", () => {
+    if(!isDragging) return;
+    isDragging = false;
+
+    function momentum(){
+        if(Math.abs(velocity) < 0.01){
+            snapToNearest();
+            cancelAnimationFrame(animationFrame);
+            return;
+        }
+
+        current += velocity * 0.012;
+        velocity *= friction;
+
+        update();
+        animationFrame = requestAnimationFrame(momentum);
+    }
+
+    momentum();
+});
+
+/* =========================
+   TOUCH SUPPORT
+========================= */
+carousel.addEventListener("touchstart", (e) => {
+    lastX = e.touches[0].clientX;
+    velocity = 0;
+    clearInterval(autoRotate);
+});
+
+carousel.addEventListener("touchmove", (e) => {
+    let x = e.touches[0].clientX;
+    let delta = x - lastX;
+
+    velocity = delta;
+
+    let speedFactor = Math.min(Math.abs(delta) * 0.002, 2);
+
+    current += delta * sensitivity * speedFactor;
+
+    update();
+    lastX = x;
+});
+
+carousel.addEventListener("touchend", () => {
+    function momentum(){
+        if(Math.abs(velocity) < 0.01){
+            snapToNearest();
+            cancelAnimationFrame(animationFrame);
+            return;
+        }
+
+        current += velocity * 0.012;
+        velocity *= friction;
+
+        update();
+        animationFrame = requestAnimationFrame(momentum);
+    }
+
+    momentum();
+});
+
+/* =========================
+   KEYBOARD CONTROL
+========================= */
+document.addEventListener("keydown", function(e){
+    if(e.key === "ArrowLeft"){
+        rotate(-1);
+    }
+    if(e.key === "ArrowRight"){
+        rotate(1);
+    }
+});
+
+/* =========================
+   PARTICLES
+========================= */
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+
+function resize(){
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+resize();
+window.addEventListener("resize", resize);
+
+let particles = [];
+
+for(let i=0;i<80;i++){
+    particles.push({
+        x:Math.random()*canvas.width,
+        y:Math.random()*canvas.height,
+        r:Math.random()*2,
+        dx:Math.random()-.5,
+        dy:Math.random()-.5
+    });
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+
+    particles.forEach(p=>{
+        p.x += p.dx;
+        p.y += p.dy;
+
+        if(p.x<0||p.x>canvas.width) p.dx*=-1;
+        if(p.y<0||p.y>canvas.height) p.dy*=-1;
+
+        ctx.beginPath();
+        ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+        ctx.fillStyle="rgba(255,255,255,0.5)";
+        ctx.fill();
+    });
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
