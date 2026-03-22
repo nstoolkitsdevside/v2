@@ -251,15 +251,45 @@ button:hover{
     border-color:rgba(246,201,14,0.3);
 }
 
-    /* FOOTER */
-    footer {
-        padding: 20px;
-        opacity: .5;
-        text-align: center;
-        font-size: 14px;
-        margin-top: auto;
-    }
+/* 1. Set the body to be a full-height flexbox column */
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: radial-gradient(circle at top, #1a1a1a 0%, #0b0b0b 60%);
+    color: var(--text);
+    
+    /* ADD THESE */
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; 
+}
 
+/* 2. Tell the container to grow and take up all empty space */
+.container {
+    width: 100%;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box; /* Ensures padding doesn't break width */
+    
+    /* ADD THIS - This pushes the footer down */
+    flex: 1 0 auto; 
+}
+
+/* 3. Footer stays at the very bottom of the flex stack */
+footer {
+    width: 100%;
+    padding: 20px 0;
+    opacity: .5;
+    text-align: center;
+    font-size: 14px;
+    background: rgba(0, 0, 0, 0.2); /* Slight dark tint to keep it distinct */
+    flex-shrink: 0; /* Prevents the footer from squishing */
+}
 /* MODAL */
 .modal{
     position:fixed;
@@ -356,9 +386,17 @@ button:hover{
 
             <div class="card">
                 <a href="tools/caseflip.html">
-                    <img class="icon" src="https://i.imgur.com/CEfCEs1.png">
+                    <img class="icon" src="https://img.icons8.com/ios7/1200/sentence-case.jpg">
                     <h3>CaseFlip</h3>
                     <span>Converter</span>
+                </a>
+            </div>
+			
+			            <div class="card">
+                <a href="tools/easeapp.html">
+                    <img class="icon" src="https://cdn-icons-png.flaticon.com/512/17806/17806095.png">
+                    <h3>EaseApp</h3>
+                    <span>Summary Maker</span>
                 </a>
             </div>
 
@@ -370,26 +408,6 @@ button:hover{
         <button onclick="rotate(1)">➡</button>
     </div>
 &nbsp;
-    <div class="section-title">THE CRAFTSMEN</div>
-
-    <div class="tool-grid">
-        <div class="tool-card">
-            <h4>Morvan Hsu</h4>
-            <small>Developer</small>
-        </div>
-
-        <div class="tool-card">
-            <h4>Darel Miranda</h4>
-            <small>Developer</small>
-        </div>
-
-        <div class="tool-card">
-            <h4>Our Team</h4>
-            <small>For Beta Testing</small>
-        </div>
-    </div>
-
-<footer>© 2026 NS Tool Kits v3 | Made by Morvan Hsu and Darel Miranda</footer>
 
 </div>
 
@@ -400,7 +418,9 @@ button:hover{
         <button onclick="closeModal()">Close</button>
     </div>
 </div>
+<footer>© 2026 NS Tool Kits v3 | Made by Morvan Hsu and Darel Miranda</footer>
 
+<div class="modal" id="modal">...</div>
 <script>
 const carousel = document.getElementById('carousel');
 const cards = document.querySelectorAll('.card');
