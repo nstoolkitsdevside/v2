@@ -1635,36 +1635,42 @@
                     </button>
                 
                     <button type="button" 
-                            class="add-btn" 
-                            style="border: 2px solid #3498db; color: #3498db; width: 130px; justify-content: center;"
-                            @click="
-                                const outputHtml = isEditing ? manualReportHTML : reportText;
-                                const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = outputHtml;
-                                
-                                const htmlBlob = new Blob([outputHtml], { type: 'text/html' });
-                                const textBlob = new Blob([tempDiv.innerText], { type: 'text/plain' });
-                
-                                const clipboardItem = new ClipboardItem({
-                                    'text/html': htmlBlob,
-                                    'text/plain': textBlob
-                                });
-                            
-                                navigator.clipboard.write([clipboardItem]).then(() => {
-                                    let btn = $event.currentTarget;
-                                    let originalText = btn.innerHTML;
-                                    btn.innerHTML = '✓ Copied!';
-                                    btn.style.backgroundColor = '#3498db';
-                                    btn.style.color = '#fff';
-                                    setTimeout(() => { 
-                                        btn.innerHTML = originalText; 
-                                        btn.style.backgroundColor = 'transparent';
-                                        btn.style.color = '#3498db';
-                                    }, 2000);
-                                });
-                            ">
-                        Copy Report
-                    </button>
+        class="add-btn" 
+        style="border: 2px solid #3498db; color: #3498db; width: 140px; height: 40px; justify-content: center; background: transparent; display: inline-flex; align-items: center; cursor: pointer;"
+        @click="
+            const reportContent = isEditing ? manualReportHTML : reportText;
+            if (!reportContent) return;
+
+            const btn = $event.currentTarget;
+            
+            // 1. Simple Copy (Reliable for all browsers)
+            const type = 'text/html';
+            const blob = new Blob([reportContent], { type });
+            const data = [new ClipboardItem({ [type]: blob, 'text/plain': new Blob([reportContent.replace(/<[^>]*>/g, '')], { type: 'text/plain' }) })];
+
+            navigator.clipboard.write(data).then(() => {
+                // 2. Force the UI update directly on the element
+                const originalHtml = btn.innerHTML;
+                btn.innerHTML = '<strong>✓ Copied!</strong>';
+                btn.style.setProperty('background-color', '#3498db', 'important');
+                btn.style.setProperty('color', '#000000', 'important');
+
+                // 3. Reset after 2 seconds
+                setTimeout(() => {
+                    btn.innerHTML = originalHtml;
+                    btn.style.setProperty('background-color', 'transparent', 'important');
+                    btn.style.setProperty('color', '#3498db', 'important');
+                }, 2000);
+            }).catch(err => {
+                // Fallback if ClipboardItem fails
+                navigator.clipboard.writeText(reportContent.replace(/<[^>]*>/g, '')).then(() => {
+                    btn.innerText = '✓ Copied!';
+                    setTimeout(() => { btn.innerText = 'Copy Report'; }, 2000);
+                });
+            });
+        ">
+    Copy Report
+</button>
                 </div>
             </div>
 
