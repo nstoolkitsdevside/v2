@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NS Excellence Extractor | v3</title>
+     <link rel="icon" type="image/jpg" href="https://i.imgur.com/QWLMgK8.jpeg">
+    
+    <style>
+        :root {
+            --bg: #0b0b0b;
+            --card: rgba(255, 255, 255, 0.05);
+            --accent: #f6c90e;
+            --text: #fff;
+            --border: rgba(246, 201, 14, 0.15);
+        }
+
+        /* Prevent scrolling on the main page */
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; 
+            font-family: 'Segoe UI', sans-serif;
+            background: radial-gradient(circle at top, #1a1a1a 0%, #0b0b0b 60%);
+            color: var(--text);
+        }
+
+        canvas#bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: -1;
+        }
+
+        /* NAVBAR */
+        /* NAVBAR */
+        .navbar {
+            width: 100%;
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(246, 201, 14, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .nav-left h1 { margin: 0; font-size: 20px; color: var(--accent); letter-spacing: 1px; }
+
+        .nav-menu {
+            display: flex;
+            gap: 28px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .nav-menu a {
+            color: #e6e6e6;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
+
+        .nav-menu a:hover, .nav-menu a.active { color: var(--accent); opacity: 1; }
+
+        /* MAIN LAYOUT FOR SINGLE PAGE */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            height: calc(100vh - 120px); /* Height minus nav and footer */
+            display: flex;
+            flex-direction: column;
+            box-sizing: border-box;
+        }
+
+        .header-section {
+            text-align: center;
+            margin-bottom: 15px;
+            flex-shrink: 0;
+        }
+
+        .app-title {
+            font-size: 2rem;
+            margin: 0 0 5px 0;
+            color: var(--accent);
+            text-shadow: 0 0 15px rgba(246, 201, 14, 0.2);
+        }
+
+        .subtitle {
+            color: #bdc3c7;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        /* BUTTONS */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 15px 0;
+            flex-shrink: 0;
+        }
+
+        .buttons {
+            background: linear-gradient(135deg, #f6c90e, #d4a800);
+            color: #111;
+            border: none;
+            padding: 8px 22px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .buttons:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(246, 201, 14, 0.4);
+        }
+
+        .buttons:active {
+            transform: translateY(0);
+        }
+
+        /* EDITOR LAYOUT */
+        .editor-container {
+            flex-grow: 1; /* Fills remaining height */
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px;
+            backdrop-filter: blur(5px);
+            display: flex;
+            flex-direction: column;
+            min-height: 0; /* Important for flex child scrolling */
+        }
+
+        .main-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            height: 100%;
+        }
+
+        .input-section, .output-section {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .inputarea {
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 15px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-y: auto;
+            outline: none;
+            transition: border-color 0.3s;
+            line-height: 1.5;
+        }
+
+        .inputarea:focus {
+            border-color: var(--accent);
+        }
+
+        [contenteditable]:empty:before {
+            content: attr(placeholder);
+            color: #555;
+        }
+
+        footer {
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: .5;
+            font-size: 0.8rem;
+            flex-shrink: 0;
+        }
+
+        @media(max-width:768px){
+            .nav-menu { display:none; }
+            .main-wrapper { grid-template-columns: 1fr; }
+            html, body { overflow-y: auto; height: auto; }
+            .container { height: auto; }
+        }
+    </style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="navbar">
+    <div class="nav-inner">
+        <div class="nav-left"><h1>NS Toolkits v3</h1></div>
+        <div class="nav-menu">
+             <a href="https://nstoolkits.site/v3/">Home</a>
+            <a href="about.html">About Us</a>
+            <a href="https://nstoolkits.site/">Version 2</a>
+        </div>
+    </div>
+</div>
+
+<main class="container">
+    <div class="header-section">
+        <h2 class="app-title">NS Excellence Extractor</h2>
+        <p class="subtitle">
+            Your search query cleaner. It does everything for you. | <i>A tool may ease the work.</i>
+        </p>
+    </div>
+
+    <div class="button-container">
+        <button class="buttons" id="cleanBtn">Clean Up</button>
+        <button class="buttons" id="copyBtn">Copy</button>
+        <button class="buttons" id="clearBtn">Clear</button>
+    </div>
+
+    <div class="editor-container">
+        <div class="main-wrapper">
+            <section class="input-section">
+                <div class="inputarea" id="text-input" contenteditable="true" placeholder="Paste text here..."></div>
+            </section>
+
+            <section class="output-section">
+                <div class="inputarea" id="output-view" placeholder="Cleaned output will appear here..."></div>
+            </section>
+        </div>
+    </div>
+</main>
+
+<footer>
+    &copy; 2026 NS Tool Kits v3 | Made by Morvan Hsu and Darel Miranda
+</footer>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+<script src="../scripts/excellenceextractorscripts.js"></script>
+
+<script>
+/** * PROTECTION SCRIPTS 
+ */
+document.addEventListener("keydown", function(e) {
+    if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
+        e.preventDefault();
+        return false;
+    }
+});
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+/**
+ * PARTICLES BACKGROUND
+ */
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+let particles = [];
+
+function initCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+}
+
+class Particle {
+    constructor() {
+        this.x = Math.random() * canvas.width;
+        this.y = Math.random() * canvas.height;
+        this.size = Math.random() * 1.5;
+        this.speedX = Math.random() * 0.4 - 0.2;
+        this.speedY = Math.random() * 0.4 - 0.2;
+    }
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        if (this.x > canvas.width) this.x = 0;
+        if (this.x < 0) this.x = canvas.width;
+        if (this.y > canvas.height) this.y = 0;
+        if (this.y < 0) this.y = canvas.height;
+    }
+    draw() {
+        ctx.fillStyle = 'rgba(246, 201, 14, 0.2)';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+function initParticles() {
+    particles = [];
+    for (let i = 0; i < 80; i++) {
+        particles.push(new Particle());
+    }
+}
+
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animate);
+}
+
+window.addEventListener('resize', () => {
+    initCanvas();
+    initParticles();
+});
+
+initCanvas();
+initParticles();
+animate();
+</script>
+</body>
+</html>

@@ -29,104 +29,45 @@ canvas{
     z-index:-1;
 }
 
-/* NAVBAR */
-.navbar{
-    width:100%;
-    background:rgba(20,20,20,0.6);
-    backdrop-filter: blur(12px);
-    border-bottom:1px solid rgba(246,201,14,0.15);
-}
+ /* NAVBAR */
+        .navbar {
+            width: 100%;
+            background: rgba(20, 20, 20, 0.6);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(246, 201, 14, 0.15);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
 
-.nav-inner{
-    max-width:1100px;
-    margin:0 auto;
-    padding:14px 20px;
+        .nav-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
 
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-}
+        .nav-left h1 { margin: 0; font-size: 20px; color: var(--accent); letter-spacing: 1px; }
 
-/* LEFT */
-.nav-left{
-    display:flex;
-    align-items:center;
-}
+        .nav-menu {
+            display: flex;
+            gap: 28px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
 
-/* CENTER MENU (true center) */
-.nav-menu{
-    display:flex;
-    gap:28px;
-    position:absolute;
-    left:50%;
-    transform:translateX(-50%);
-}
+        .nav-menu a {
+            color: #e6e6e6;
+            text-decoration: none;
+            font-size: 14px;
+            opacity: 0.8;
+            transition: 0.3s;
+        }
 
-/* RIGHT */
-.nav-right{
-    display:flex;
-    align-items:center;
-}
-
-.nav-left h1{
-    margin:0;
-    font-size:20px;
-    color:var(--accent);
-    letter-spacing:1px;
-}
-
-/* MENU */
-.nav-menu{
-    justify-self:center;
-    display:flex;
-    gap:28px;
-}
-
-.nav-menu a{
-    color:#e6e6e6;
-    text-decoration:none;
-    font-size:14px;
-    opacity:0.8;
-    transition:0.3s;
-    position:relative;
-}
-
-.nav-menu a:hover{
-    color:var(--accent);
-    opacity:1;
-}
-
-.nav-menu a::after{
-    content:'';
-    position:absolute;
-    left:0;
-    bottom:-5px;
-    width:0%;
-    height:2px;
-    background:var(--accent);
-    transition:0.3s;
-}
-
-.nav-menu a:hover::after{
-    width:100%;
-}
-
-/* NAV BUTTON */
-.nav-right button{
-    background:linear-gradient(135deg,#f6c90e,#d4a800);
-    color:#111;
-    border:none;
-    padding:8px 12px;
-    border-radius:10px;
-    cursor:pointer;
-    box-shadow:0 0 10px rgba(246,201,14,0.4);
-    transition:0.3s;
-}
-
-.nav-right button:hover{
-    transform:scale(1.05);
-    box-shadow:0 0 16px rgba(246,201,14,0.7);
-}
+        .nav-menu a:hover, .nav-menu a.active { color: var(--accent); opacity: 1; }
 
 /* RESPONSIVE */
 @media(max-width:768px){
@@ -366,21 +307,14 @@ button:hover{
 
 <canvas id="bg"></canvas>
 
-<!-- NAVBAR -->
 <div class="navbar">
     <div class="nav-inner">
-
-        <div class="nav-left">
-            <h1>NS Toolkits</h1>
-        </div>
-
+        <div class="nav-left"><h1>NS Toolkits v3</h1></div>
         <div class="nav-menu">
-            <a href="index.html">Home</a>
-            <a href="tools.html">Tools</a>
-            <a href="about.html">About</a>
-            <a href="team.html">Team</a>
+             <a href="https://nstoolkits.site/v3/">Home</a>
+            <a href="about.html">About Us</a>
+            <a href="https://nstoolkits.site/">Version 2</a>
         </div>
-
     </div>
 </div>
 
@@ -397,7 +331,7 @@ button:hover{
         <div class="carousel" id="carousel">
 
             <div class="card">
-                <a href="template-writer.html">
+                <a href="tools/templatewriter.html">
                     <img class="icon" src="https://i.imgur.com/7i02XKM.png">
                     <h3>Template Writer</h3>
                     <span>Generator</span>
@@ -405,7 +339,7 @@ button:hover{
             </div>
 
             <div class="card">
-                <a href="template-lite.html">
+                <a href="tools/templatewriterlite.html">
                     <img class="icon" src="https://i.imgur.com/RTJon1q.png">
                     <h3>Template Writer</h3>
                     <span>Lite Version</span>
@@ -413,7 +347,7 @@ button:hover{
             </div>
 
             <div class="card">
-                <a href="extractor.html">
+                <a href="tools/excellenceextractor.html">
                     <img class="icon" src="https://i.imgur.com/kAY5lXj.png">
                     <h3>Excellence Extractor</h3>
                     <span>Cleaner</span>
@@ -421,7 +355,7 @@ button:hover{
             </div>
 
             <div class="card">
-                <a href="caseflip.html">
+                <a href="tools/caseflip.html">
                     <img class="icon" src="https://i.imgur.com/CEfCEs1.png">
                     <h3>CaseFlip</h3>
                     <span>Converter</span>
