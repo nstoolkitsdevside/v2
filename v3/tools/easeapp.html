@@ -408,7 +408,7 @@
                         let match = rawLink.match(/href=[\x22']([^\x22']+)[\x22']/);
                         let url = match ? match[1] : rawLink;
                         if (!url.startsWith('http')) url = 'https://' + url;
-                        return `<a href='${url}' style='color: #0563c1; text-decoration: underline;'>${cleanName}</a>`;
+                        return `<a href='${url}' style='color: #ADD8E6; text-decoration: underline;'>${cleanName}</a>`;
                     }
                     return cleanName;
                 });
@@ -1075,7 +1075,7 @@
                                                 let href = links[i].getAttribute('href');
                                                 links[i].removeAttribute('style');
                                                 // Ensure the link stays blue only inside the tag
-                                                links[i].style.color = '#0563c1';
+                                                links[i].style.color = '#ADD8E6';
                                                 links[i].style.textDecoration = 'underline';
                                             }
                                         
@@ -1214,7 +1214,7 @@
                                                 let href = links[i].getAttribute('href');
                                                 links[i].removeAttribute('style');
                                                 // Ensure the link stays blue only inside the tag
-                                                links[i].style.color = '#0563c1';
+                                                links[i].style.color = '#ADD8E6';
                                                 links[i].style.textDecoration = 'underline';
                                             }
                                         
@@ -1364,7 +1364,7 @@
                                             let href = links[i].getAttribute('href');
                                             links[i].removeAttribute('style');
                                             // Ensure the link stays blue only inside the tag
-                                            links[i].style.color = '#0563c1';
+                                            links[i].style.color = '#ADD8E6';
                                             links[i].style.textDecoration = 'underline';
                                         }
                                     
@@ -1552,7 +1552,7 @@
                                             let href = links[i].getAttribute('href');
                                             links[i].removeAttribute('style');
                                             // Ensure the link stays blue only inside the tag
-                                            links[i].style.color = '#0563c1';
+                                            links[i].style.color = '#ADD8E6';
                                             links[i].style.textDecoration = 'underline';
                                         }
                                     
