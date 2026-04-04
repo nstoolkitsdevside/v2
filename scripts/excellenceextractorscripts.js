@@ -62,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Apply the requested prefix based on link count
     let prefix = '';
     if (linkCount >= 2) {
-      prefix = '<p>No match found. Please see search queries below.</p><p>&nbsp;</p>'</p>';
+      prefix = '<p>No match found. Please see search queries below.</p>';&nbsp;
     } else if (linkCount === 1) {
       prefix = '<p>No match found. Please see search query below.</p><p>&nbsp;</p>';
     }
@@ -168,6 +168,5 @@ function stripTablesAndStructure(node) {
   return innerContent;
 
 }
-
 
 
