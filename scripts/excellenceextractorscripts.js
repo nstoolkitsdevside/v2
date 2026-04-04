@@ -168,6 +168,3 @@ function stripTablesAndStructure(node) {
   return innerContent;
 
 }
-
-
-
