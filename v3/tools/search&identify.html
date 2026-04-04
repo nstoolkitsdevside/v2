@@ -147,21 +147,23 @@
             text-align: center;
         }
 
-        /* Column Widths */
-        th:nth-child(1), td:nth-child(1) { width: 40px; } /* Del */
-        th:nth-child(2), td:nth-child(2) { width: 140px; text-align: left; } /* Name */
-        th:nth-child(3), td:nth-child(3) { width: 100px; } /* City */
-        th:nth-child(4), td:nth-child(4) { width: 60px; }  /* State */
-        th:nth-child(5), td:nth-child(5) { width: 70px; }  /* Bulk */
+        /* Adjusted Column Widths for the new field */
+        th:nth-child(1), td:nth-child(1) { width: 40px; } 
+        th:nth-child(2), td:nth-child(2) { width: 140px; text-align: left; } 
+        th:nth-child(3), td:nth-child(3) { width: 90px; } 
+        th:nth-child(4), td:nth-child(4) { width: 45px; }  
+        th:nth-child(5), td:nth-child(5) { width: 100px; } /* Addit. Combo */
+        th:nth-child(6), td:nth-child(6) { width: 60px; }  /* Bulk */
 
         td:first-child { border-left: 1px solid var(--border-color); border-radius: 8px 0 0 8px; }
         td:last-child { border-right: 1px solid var(--border-color); border-radius: 0 8px 8px 0; }
 
-        .name-input, .city-input, .state-input { 
+        .name-input, .city-input, .state-input, .extra-input { 
             background: transparent; border: none; color: var(--accent-gold); 
-            font-weight: 700; width: 100%; font-size: 12px;
+            font-weight: 700; width: 100%; font-size: 11px;
         }
-        .city-input, .state-input { color: var(--text-main); font-weight: 400; font-size: 11px; }
+        .city-input, .state-input, .extra-input { color: var(--text-main); font-weight: 400; }
+        .extra-input { color: var(--text-dim); font-style: italic; }
         input:focus { outline: none; border-bottom: 1px solid var(--accent-gold); }
 
         a { color: var(--accent-gold); text-decoration: none; font-size: 10px; font-weight: bold; }
@@ -215,9 +217,10 @@
                     <thead>
                         <tr>
                             <th>Del</th>
-                            <th>POI Name</th>
+                            <th>POI Name/Username</th>
                             <th>City</th>
-                            <th>State</th>
+                            <th>ST</th>
+                            <th>Additional</th>
                             <th>Bulk</th>
                             <th title="Facebook">FB</th>
                             <th title="Picuki">PIC</th>
@@ -267,7 +270,8 @@
             const rows = Array.from(document.querySelectorAll('#tableBody tr')).map(row => ({
                 name: row.querySelector('.name-input').value,
                 city: row.querySelector('.city-input').value,
-                state: row.querySelector('.state-input').value
+                state: row.querySelector('.state-input').value,
+                extra: row.querySelector('.extra-input').value
             }));
             localStorage.setItem('ns_si_data_v3', JSON.stringify(rows));
         }
@@ -282,6 +286,7 @@
                     row.querySelector('.name-input').value = d.name;
                     row.querySelector('.city-input').value = d.city;
                     row.querySelector('.state-input').value = d.state;
+                    row.querySelector('.extra-input').value = d.extra || "";
                     updateLinks(row.querySelector('.name-input'));
                 });
             } else addRow();
@@ -295,6 +300,7 @@
                 <td><input type="text" class="name-input" placeholder="Name..." oninput="updateLinks(this)"></td>
                 <td><input type="text" class="city-input" placeholder="City" oninput="updateLinks(this)"></td>
                 <td><input type="text" class="state-input" placeholder="ST" oninput="updateLinks(this)"></td>
+                <td><input type="text" class="extra-input" placeholder="Keyword..." oninput="updateLinks(this)"></td>
                 <td><button class="btn btn-open-all" onclick="openAllInRow(this)" style="display:none">OPEN</button></td>
             `;
             for (let i = 0; i < 22; i++) cellsHTML += `<td><a href="#" target="_blank" class="hidden-link">GO</a></td>`;
@@ -305,49 +311,43 @@
             return row;
         }
 
-function updateLinks(input) {
-    const row = input.closest('tr');
-    const name = row.querySelector('.name-input').value.trim();
-    const city = row.querySelector('.city-input').value.trim();
-    const state = row.querySelector('.state-input').value.trim();
-    const links = row.querySelectorAll('a');
-    const bulkBtn = row.querySelector('.btn-open-all');
+        function updateLinks(input) {
+            const row = input.closest('tr');
+            const name = row.querySelector('.name-input').value.trim();
+            const city = row.querySelector('.city-input').value.trim();
+            const state = row.querySelector('.state-input').value.trim();
+            const extra = row.querySelector('.extra-input').value.trim();
+            const links = row.querySelectorAll('a');
+            const bulkBtn = row.querySelector('.btn-open-all');
 
-    if (name) {
-        bulkBtn.style.display = "block";
-        
-        // Build query with commas: "Name, City, State"
-        let queryParts = [name];
-        if (city) queryParts.push(city);
-        if (state) queryParts.push(state);
-        
-        const query = queryParts.join(", "); // Adds the comma and space automatically
-        const enc = encodeURIComponent(query);
-        
-        for (let i = 0; i < searchTemplates.length; i++) {
-            // Vimeo requires a specific suffix, others use the standard template
-            links[i].href = searchTemplates[i] + enc + (searchTemplates[i].includes("vimeo") ? "&type=people" : "");
-            links[i].classList.remove('hidden-link');
-        }
+            if (name) {
+                bulkBtn.style.display = "block";
+                
+                // Construct the combined search string with commas
+                let queryParts = [name];
+                if (city) queryParts.push(city);
+                if (state) queryParts.push(state);
+                if (extra) queryParts.push(extra);
+                
+                const query = queryParts.join(", "); 
+                const enc = encodeURIComponent(query);
+                
+                for (let i = 0; i < searchTemplates.length; i++) {
+                    links[i].href = searchTemplates[i] + enc + (searchTemplates[i].includes("vimeo") ? "&type=people" : "");
+                    links[i].classList.remove('hidden-link');
+                }
 
-        // Special URL formats (Venmo and Spotify usually work best with just the Name)
-        const venmoIndex = 20; 
-        const spotifyIndex = 21;
-        
-        if (links[venmoIndex]) {
-            links[venmoIndex].href = `https://www.venmo.com/u/${name.replace(/\s+/g, '-')}`;
-            links[venmoIndex].classList.remove('hidden-link');
+                // Special direct links usually work better with Name only to avoid 404s
+                links[20].href = `https://www.venmo.com/u/${name.replace(/\s+/g, '-')}`;
+                links[20].classList.remove('hidden-link');
+                links[21].href = `https://open.spotify.com/search/${encodeURIComponent(name)}`;
+                links[21].classList.remove('hidden-link');
+            } else {
+                bulkBtn.style.display = "none";
+                links.forEach(l => l.classList.add('hidden-link'));
+            }
+            saveToLocalStorage();
         }
-        if (links[spotifyIndex]) {
-            links[spotifyIndex].href = `https://open.spotify.com/search/${encodeURIComponent(name)}`;
-            links[spotifyIndex].classList.remove('hidden-link');
-        }
-    } else {
-        bulkBtn.style.display = "none";
-        links.forEach(l => l.classList.add('hidden-link'));
-    }
-    saveToLocalStorage();
-}
 
         function removeRow(btn) { btn.closest('tr').remove(); updateCount(); saveToLocalStorage(); }
         function updateCount() { document.getElementById('rowCount').innerText = `${document.getElementById('tableBody').children.length} TARGETS LOADED`; }
@@ -359,7 +359,6 @@ function updateLinks(input) {
         };
     </script>
     <script>
-        // Background Particles
         const canvas = document.getElementById("bg");
         const ctx = canvas.getContext("2d");
         let pts = [];
@@ -376,7 +375,6 @@ function updateLinks(input) {
             requestAnimationFrame(anim);
         }
         anim();
-        // Protection
         document.addEventListener("contextmenu", e => e.preventDefault());
         document.onkeydown = e => { if(e.keyCode===123 || (e.ctrlKey && e.shiftKey && (e.keyCode===73 || e.keyCode===74)) || (e.ctrlKey && e.keyCode===85)) e.preventDefault(); };
     </script>
