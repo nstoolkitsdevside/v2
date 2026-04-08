@@ -130,32 +130,22 @@
             margin-bottom: 15px;
         }
 
-.btn-download {
-    display: inline-flex;      /* Use flex for better alignment */
-    align-items: center;
-    justify-content: center;
-    background: var(--accent);
-    color: #000;
-    
-    /* THE FIX: Fixed width and tight padding */
-    width: auto;               
-    min-width: 140px;          /* Prevents it from being too tiny, but stops full-width */
-    padding: 8px 16px;         
-    
-    border-radius: 6px;        
-    text-decoration: none;
-    font-weight: bold;
-    font-size: 0.8rem;         
-    margin: 20px auto 0 auto;  /* Centers it horizontally */
-    transition: 0.3s;
-    border: none;
-}
+        .btn-download {
+            display: block;
+            background: var(--accent);
+            color: #000;
+            padding: 12px 25px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 20px;
+            transition: 0.3s;
+        }
 
-.btn-download:hover {
-    filter: brightness(1.1);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(246, 201, 14, 0.2);
-}
+        .btn-download:hover {
+            filter: brightness(1.1);
+            box-shadow: 0 5px 15px rgba(246, 201, 14, 0.3);
+        }
 
         /* TEAM CARDS */
         .team-grid {
@@ -252,8 +242,8 @@
         <div class="nav-left"><h1>NS Toolkits v3</h1></div>
         <div class="nav-menu">
              <a href="https://nstoolkits.site/v3/">Home</a>
-             <a href="download.html">Download</a>
-            <a href="about.html" class="active">About Us</a>
+            <a href="https://nstoolkits.site/v3/about.html">About Us</a>
+         <a href="https://nstoolkits.site/v3/download.html">Download</a>
             <a href="https://nstoolkits.site/">Version 2</a>
         </div>
     </div>
@@ -271,10 +261,8 @@
 				<p>
             <strong>Metascraper</strong> is a high-efficiency extraction engine designed to instantly capture and format webpage metadata. It can also clean data such as removing .ph or Philippines and lets you copy or download it using a hotkey. | Default hotkey Ctrl+Shift+Z (copy) or Ctrl+Shift+Q to download.
         </p>
-		<div style="display: flex; justify-content: center;">
-        <a href="https://drive.google.com/uc?export=download&id=1uilsrMsny1LXhKyTL2kC3fnuBtl39yl1" class="btn-download">Download Here</a>
-    </div>
-			
+                <a href="https://drive.google.com/uc?export=download&id=1uilsrMsny1LXhKyTL2kC3fnuBtl39yl1" class="btn-download">Download Here</a>
+            </div>
         </div>
     </section>
 
