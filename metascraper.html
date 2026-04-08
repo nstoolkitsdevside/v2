@@ -281,14 +281,136 @@
 <footer> 2026 NS Tool Kits | Developed by Morvan Hsu and Darel Miranda</footer>
 
 <script>
-    // Security Script
+
+document.addEventListener("keydown", function(e) {
+
+  // Block F12 and common shortcuts (Ctrl+Shift+I/J, Ctrl+U)
+
+  if (
+
+    e.keyCode === 123 ||
+
+    (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) ||
+
+    (e.ctrlKey && e.keyCode === 85)
+
+  ) {
+
+    e.preventDefault();
+
+    return false;
+
+  }
+
+
+
+  // Block Ctrl + A
+
+  if (e.ctrlKey && (e.key === "a" || e.key === "A")) {
+
+    e.preventDefault();
+
+    return false;
+
+  }
+
+});
+
+
+
+document.addEventListener("keydown", function(e) {
+
+  if (e.ctrlKey && e.shiftKey && e.key === "C") {
+
+    e.preventDefault();
+
+  }
+
+});
+
+
+
+// Disable right-click
+
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+
+
+// Disable text selection via mouse drag
+
+document.addEventListener("selectstart", e => e.preventDefault());
+
+
+
+// Prevent dragging elements (images/text)
+
+document.addEventListener("dragstart", e => e.preventDefault());
+
+</script>
+
+<script>
+
+    /* ALL YOUR CAROUSEL AND PARTICLE CODE REMAINS THE SAME */
+
+
+
+    // UPDATED LOADING LOGIC
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const loader = document.getElementById("loader-wrapper");
+
+        const LOADING_DURATION = 3500; 
+
+        const ONE_HOUR = 3600000; 
+
+
+
+        const lastLoad = localStorage.getItem("ns_v3_load_time");
+
+        const now = Date.now();
+
+
+
+        if (!lastLoad || (now - lastLoad) > ONE_HOUR) {
+
+            // First time or expired - Show Loading
+
+            setTimeout(() => {
+
+                document.body.classList.add("loaded");
+
+                localStorage.setItem("ns_v3_load_time", now);
+
+                setTimeout(() => { loader.style.display = "none"; }, 1000);
+
+            }, LOADING_DURATION);
+
+        } else {
+		
+            // Within 1 hour - Skip Loading
+            loader.style.display = "none";
+            document.body.classList.add("loaded");
+        }
+    });
+
+    // YOUR PROTECTION CODE (F12, Right Click, etc.)
+    document.addEventListener("contextmenu", e => e.preventDefault());
     document.addEventListener("keydown", function(e) {
         if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74)) || (e.ctrlKey && e.keyCode === 85)) {
             e.preventDefault();
-            return false;
         }
     });
-    document.addEventListener("contextmenu", e => e.preventDefault());
 </script>
+<style>
+
+/* Prevent text highlighting via mouse drag */
+body {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  -moz-user-select: none;
+}
+</style>
 </body>
 </html>
