@@ -80,16 +80,17 @@
         .app-container { display: flex; flex-grow: 1; overflow: hidden; }
 
         .sidebar {
-            width: 260px; 
-            background-color: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            flex-shrink: 0;
-            overflow-y: auto;
-        }
+		width: 260px; 
+		background-color: var(--card-bg);
+		border-right: 1px solid var(--border-color);
+		padding: 20px;
+		display: flex;
+		flex-direction: column;
+		height: calc(100vh - 55px); 
+		flex-shrink: 0;
+		overflow-y: auto;
+		box-sizing: border-box;
+		}
 
         .sidebar h2 { color: var(--accent-gold); font-size: 1.1rem; margin: 0; text-transform: uppercase; }
         .sidebar p { font-size: 0.75rem; color: var(--text-dim); line-height: 1.4; }
@@ -253,13 +254,13 @@
     <div class="app-container">
         <aside class="sidebar">
             <h2>Socmed S&I</h2>
-            <p>Advanced Social Intelligence Gathering. v4.0</p>
+            <p>Advanced Social Intelligence Gathering. v5.0</p>
             
             <div class="input-group">
                 <label>Management</label>
                 <button class="btn btn-add" onclick="addRow()">+</button>
             </div>
-
+&nbsp;
             <div class="toggle-container">
                 <label style="font-size: 10px; cursor: pointer;" for="mainToggle">Main Socmed</label>
                 <label class="switch">
@@ -303,14 +304,34 @@
                 <button class="btn btn-crim" onclick="crimSearch('rainstreet')">Rain Street</button>
                 <button class="btn btn-crim" onclick="crimSearch('localcrimenews')">Local Crime News</button>
             </div>
+			
+			<div class="toggle-container">
+				<label style="font-size: 10px; cursor: pointer;" for="finToggle">Wallet Search</label>
+				<label class="switch">
+				<input type="checkbox" id="finToggle" onchange="toggleSection('finSection', this.checked)">
+				<span class="slider"></span>
+				</label>
+			</div>
 
-            <div class="history-container">
-                <label>Recent Searches</label>
-                <div id="historyList" class="history-list"></div>
-            </div>
+			<div id="finSection" style="display: none; flex-direction: column; gap: 4px; border-left: 2px solid #00d4ff; padding-left: 10px; margin-top: 5px;">
+			<p style="font-size: 9px; color: #00d4ff; margin: 2px 0 6px 0; opacity: 0.8; line-height: 1.2;">
+			Direct username. (Ignores First and Last name, City/State filters)
+			</p>
+			<button class="btn btn-crim" style="border-color: #00d4ff;" onclick="finSearch('cash')">CashApp ($)</button>
+			<button class="btn btn-crim" style="border-color: #00d4ff;" onclick="finSearch('paypal')">PayPal.me</button>
+			</div>
+			&nbsp;
+			<div class="history-container">
+			<label>Recent Searches</label>
+			<div id="historyList" class="history-list"></div>
+		</div>
 
-            <div style="margin-top: auto; font-size: 10px; color: var(--text-dim);">Made by Darel Miranda</div>
-        </aside>
+			<div style="flex-grow: 1;"></div>
+
+		<div style="padding-top: 20px; border-top: 1px solid var(--border-color); flex-shrink: 0; margin-top: 20px;">
+		<div style="font-size: 10px; color: var(--text-dim);">Made by Darel Miranda | NS ToolKits Team</div>
+		</div>
+		</aside>
 
         <main class="main-content">
             <header class="header-bar">
@@ -337,328 +358,336 @@
     </div>
 
 <script>
-        let lastSelectedRow = null;
-        let searchTimeout;
+    let lastSelectedRow = null;
+    let searchTimeout;
 
-        const mainSocials = [
-            { short: "FB", full: "Facebook" }, { short: "IG", full: "Instagram" }, { short: "TW", full: "Twitter" },
-            { short: "YT", full: "YouTube" }, { short: "LI", full: "LinkedIn" }, { short: "TK", full: "TikTok" },
-            { short: "PIN", full: "Pinterest" }, { short: "STR", full: "Strava" }, { short: "TUM", full: "Tumblr" },
-            { short: "GO", full: "Google" }
-        ];
+    const mainSocials = [
+        { short: "FB", full: "Facebook" }, { short: "IG", full: "Instagram" }, { short: "TW", full: "Twitter" },
+        { short: "YT", full: "YouTube" }, { short: "LI", full: "LinkedIn" }, { short: "TK", full: "TikTok" },
+        { short: "PIN", full: "Pinterest" }, { short: "STR", full: "Strava" }, { short: "TUM", full: "Tumblr" },
+        { short: "GO", full: "Google" }
+    ];
 
-        const subSocials = [
-            { short: "POS", full: "Poshmark" }, { short: "CLA", full: "Classmates" }, { short: "ETS", full: "Etsy" },
-            { short: "SC", full: "SoundCloud" }, { short: "QU", full: "Quora" }, { short: "MUG", full: "Mugshots" },
-            { short: "VSC", full: "VSCO" }, { short: "MY", full: "MySpace" }, 
-            { short: "VIM", full: "Vimeo" }, { short: "GFM", full: "GoFundMe" }, 
-            { short: "VEN", full: "Venmo" }, { short: "SPO", full: "Spotify" }
-        ];
+    const subSocials = [
+        { short: "POS", full: "Poshmark" }, { short: "CLA", full: "Classmates" }, { short: "ETS", full: "Etsy" },
+        { short: "SC", full: "SoundCloud" }, { short: "QU", full: "Quora" }, { short: "MUG", full: "Mugshots" },
+        { short: "VSC", full: "VSCO" }, { short: "MY", full: "MySpace" }, 
+        { short: "VIM", full: "Vimeo" }, { short: "GFM", full: "GoFundMe" }, 
+        { short: "VEN", full: "Venmo" }, { short: "SPO", full: "Spotify" },
+        { short: "BSK", full: "BlueSky" }
+    ];
 
-        const searchTemplates = [
-            "https://www.facebook.com/search/top/?q=", 
-            "https://imginn.com/search/",              
-            "https://www.x.com/search?q=",             
-            "https://www.youtube.com/results?search_query=",
-            "https://www.linkedin.com/search/results/people/?keywords=", 
-            "https://www.tiktok.com/search/user?q=",
-            "https://www.pinterest.com/search/users/?q=",
-            "https://www.strava.com/athletes/search?text=",
-            "https://www.tumblr.com/search/",
-            "https://www.google.com/search?q=",
-            "https://www.poshmark.com/search?type=people&query=",
-            "https://www.classmates.com/siteui/search/results?q=",
-            "https://www.etsy.com/search_results_people.php?search_query=",
-            "https://soundcloud.com/search/people?q=",
-            "https://www.quora.com/search?type=profile&q=",
-            "https://www.mugshots.com/search.html?q=",
-            "https://vsco.co/search/people/",
-            "https://www.myspace.com/search/people?q=",
-            "https://www.vimeo.com/search?q=",          
-            "https://www.gofundme.com/s?q="            
-        ];
+    const searchTemplates = [
+        "https://www.facebook.com/search/top/?q=", 
+        "https://imginn.com/search/",              
+        "https://www.x.com/search?q=",             
+        "https://www.youtube.com/results?search_query=",
+        "https://www.linkedin.com/search/results/people/?keywords=", 
+        "https://www.tiktok.com/search/user?q=",
+        "https://www.pinterest.com/search/users/?q=",
+        "https://www.strava.com/athletes/search?text=",
+        "https://www.tumblr.com/search/",
+        "https://www.google.com/search?q=",
+        "https://www.poshmark.com/search?type=people&query=",
+        "https://www.classmates.com/siteui/search/results?q=",
+        "https://www.etsy.com/search_results_people.php?search_query=",
+        "https://soundcloud.com/search/people?q=",
+        "https://www.quora.com/search?type=profile&q=",
+        "https://www.mugshots.com/search.html?q=",
+        "https://vsco.co/search/people/",
+        "https://www.myspace.com/search/people?q=",
+        "https://www.vimeo.com/search?q=",
+        "https://www.gofundme.com/s?q="
+    ];
 
-        function updateHeaderNames() {
-            const isMain = document.getElementById('mainToggle').checked;
-            const isSub = document.getElementById('subToggle').checked;
-            const hRow = document.getElementById('headerRow');
-            
-            hRow.querySelectorAll('.main-col, .sub-col').forEach(el => el.remove());
-            const useFull = !(isMain && isSub);
-
-            mainSocials.forEach(s => {
-                let th = document.createElement('th');
-                th.className = 'main-col';
-                th.innerText = useFull ? s.full : s.short;
-                th.style.display = isMain ? 'table-cell' : 'none';
-                hRow.appendChild(th);
-            });
-
-            subSocials.forEach(s => {
-                let th = document.createElement('th');
-                th.className = 'sub-col';
-                th.innerText = useFull ? s.full : s.short;
-                th.style.display = isSub ? 'table-cell' : 'none';
-                hRow.appendChild(th);
-            });
-        }
-
-        function toggleColumns(className, isVisible) {
-            const displayValue = isVisible ? 'table-cell' : 'none';
-            document.querySelectorAll('.' + className).forEach(col => {
-                col.style.display = displayValue;
-            });
-        }
-
-        function toggleCrim(cb) {
-            document.getElementById('crimSection').style.display = cb.checked ? 'flex' : 'none';
-        }
-
-        function crimSearch(baseUrl) {
-            if (!lastSelectedRow) { alert("Please click/select a row in the table first."); return; }
-            const name = lastSelectedRow.querySelector('.name-input').value.trim();
-            const state = lastSelectedRow.querySelector('.state-input').value.trim();
-            const city = lastSelectedRow.querySelector('.city-input').value.trim();
-            if(!name) return;
-            const parts = name.split(' ');
-            const first = parts[0], last = parts.slice(1).join(' ');
-            let url = "";
-            if (baseUrl.includes('recentlybooked')) url = `https://recentlybooked.com/search?Name=${encodeURIComponent(name)}&FromDate=2024-01-01&ToDate=2026-12-31`;
-            else if (baseUrl.includes('mugshots.zone')) url = `https://mugshots.zone/?s=${encodeURIComponent(first)}+${encodeURIComponent(last)}`;
-            else if (baseUrl === 'arrests') url = `https://${state ? state.toLowerCase() : 'www'}.arrests.org/search.php?fname=${first}&lname=${last}&fpartial=True`;
-            else if (baseUrl === 'localcrimenews') url = `https://www.localcrimenews.com/welcome/searchArrests?firstname=${first}&lastname=${last}&city=${city}`;
-            else if (baseUrl === 'rainstreet') url = `https://rain-street.org/ng/search?fname=${first}&lname=${last}&state=${state}&city=${city}`;
-            else url = baseUrl + encodeURIComponent(name);
-            window.open(url, '_blank');
-        }
+    function updateHeaderNames() {
+        const isMain = document.getElementById('mainToggle').checked;
+        const isSub = document.getElementById('subToggle').checked;
+        const hRow = document.getElementById('headerRow');
         
-        function toggleSection(id, isVisible) {
-            document.getElementById(id).style.display = isVisible ? 'flex' : 'none';
-        }
+        hRow.querySelectorAll('.main-col, .sub-col').forEach(el => el.remove());
+        const useFull = !(isMain && isSub);
 
-        function legalSearch() {
-            if (!lastSelectedRow) { 
-                alert("Please click/select a row in the table first."); 
-                return; 
-            }
-            const name = lastSelectedRow.querySelector('.name-input').value.trim();
-            let stateInput = lastSelectedRow.querySelector('.state-input').value.trim().toLowerCase();
-            if(!name) { alert("Please enter a name."); return; }
-            const stateMap = {
-                "alabama": "al", "alaska": "ak", "arizona": "az", "arkansas": "ar", "california": "ca",
-                "colorado": "co", "connecticut": "ct", "delaware": "de", "florida": "fl", "georgia": "ga",
-                "hawaii": "hi", "idaho": "id", "illinois": "il", "indiana": "in", "iowa": "ia",
-                "kansas": "ks", "kentucky": "ky", "louisiana": "la", "maine": "me", "maryland": "md",
-                "massachusetts": "ma", "michigan": "mi", "minnesota": "mn", "mississippi": "ms", "missouri": "mo",
-                "montana": "mt", "nebraska": "ne", "nevada": "nv", "new hampshire": "nh", "new jersey": "nj",
-                "new mexico": "nm", "new york": "ny", "north carolina": "nc", "north dakota": "nd", "ohio": "oh",
-                "oklahoma": "ok", "oregon": "or", "pennsylvania": "pa", "rhode island": "ri", "south carolina": "sc",
-                "south dakota": "sd", "tennessee": "tn", "texas": "tx", "utah": "ut", "vermont": "vt",
-                "virginia": "va", "washington": "wa", "west virginia": "wv", "wisconsin": "wi", "wyoming": "wy"
-            };
-            const stateParam = stateMap[stateInput] || stateInput;
-            const formattedName = encodeURIComponent(name.replace(/\s+/g, '-'));
-            const url = `https://trellis.law/cases/${formattedName}?state=${stateParam}&county=&matter_type=`;
-            window.open(url, '_blank');
-        }
+        mainSocials.forEach(s => {
+            let th = document.createElement('th');
+            th.className = 'main-col';
+            th.innerText = useFull ? s.full : s.short;
+            th.style.display = isMain ? 'table-cell' : 'none';
+            hRow.appendChild(th);
+        });
 
-        /* HISTORY LOGIC */
-        function renderHistory() {
-            const history = JSON.parse(localStorage.getItem('ns_search_history') || '[]');
-            const container = document.getElementById('historyList');
-            container.innerHTML = '';
-            history.forEach((name, index) => {
-                const item = document.createElement('div');
-                item.className = 'history-item';
-                item.innerHTML = `
-                    <span onclick="loadHistoryName('${name}')">${name}</span>
-                    <div class="del-hist" onclick="deleteHistory(${index})">✕</div>
-                `;
-                container.appendChild(item);
-            });
-        }
+        subSocials.forEach(s => {
+            let th = document.createElement('th');
+            th.className = 'sub-col';
+            th.innerText = useFull ? s.full : s.short;
+            th.style.display = isSub ? 'table-cell' : 'none';
+            hRow.appendChild(th);
+        });
+    }
 
-        function saveToHistory(name) {
-            if (!name) return;
-            let history = JSON.parse(localStorage.getItem('ns_search_history') || '[]');
-            history = history.filter(h => h.toLowerCase() !== name.toLowerCase());
-            history.unshift(name);
-            if (history.length > 10) history.pop();
-            localStorage.setItem('ns_search_history', JSON.stringify(history));
-            renderHistory();
-        }
+    function toggleColumns(className, isVisible) {
+        const displayValue = isVisible ? 'table-cell' : 'none';
+        document.querySelectorAll('.' + className).forEach(col => {
+            col.style.display = displayValue;
+        });
+    }
 
-        function deleteHistory(index) {
-            let history = JSON.parse(localStorage.getItem('ns_search_history') || '[]');
-            history.splice(index, 1);
-            localStorage.setItem('ns_search_history', JSON.stringify(history));
-            renderHistory();
-        }
+    function toggleCrim(cb) {
+        document.getElementById('crimSection').style.display = cb.checked ? 'flex' : 'none';
+    }
 
-        function loadHistoryName(name) {
-            let rowToUse = lastSelectedRow || addRow();
-            const input = rowToUse.querySelector('.name-input');
-            input.value = name;
-            updateLinks(input);
-            if (!lastSelectedRow) {
-                if(lastSelectedRow) lastSelectedRow.classList.remove('active-row');
-                rowToUse.classList.add('active-row');
-                lastSelectedRow = rowToUse;
-            }
-        }
+    function crimSearch(baseUrl) {
+        if (!lastSelectedRow) { alert("Please click/select a row in the table first."); return; }
+        const name = lastSelectedRow.querySelector('.name-input').value.trim();
+        const state = lastSelectedRow.querySelector('.state-input').value.trim();
+        const city = lastSelectedRow.querySelector('.city-input').value.trim();
+        if(!name) return;
+        const parts = name.split(' ');
+        const first = parts[0], last = parts.slice(1).join(' ');
+        let url = "";
+        if (baseUrl.includes('recentlybooked')) url = `https://recentlybooked.com/search?Name=${encodeURIComponent(name)}&FromDate=2024-01-01&ToDate=2026-12-31`;
+        else if (baseUrl.includes('mugshots.zone')) url = `https://mugshots.zone/?s=${encodeURIComponent(first)}+${encodeURIComponent(last)}`;
+        else if (baseUrl === 'arrests') url = `https://${state ? state.toLowerCase() : 'www'}.arrests.org/search.php?fname=${first}&lname=${last}&fpartial=True`;
+        else if (baseUrl === 'localcrimenews') url = `https://www.localcrimenews.com/welcome/searchArrests?firstname=${first}&lastname=${last}&city=${city}`;
+        else if (baseUrl === 'rainstreet') url = `https://rain-street.org/ng/search?fname=${first}&lname=${last}&state=${state}&city=${city}`;
+        else url = baseUrl + encodeURIComponent(name);
+        window.open(url, '_blank');
+    }
+    
+    function toggleSection(id, isVisible) {
+        document.getElementById(id).style.display = isVisible ? 'flex' : 'none';
+    }
 
-        function addRow(shouldSave = true) {
-            const tbody = document.getElementById('tableBody');
-            const row = document.createElement('tr');
-            row.onclick = () => {
-                if(lastSelectedRow) lastSelectedRow.classList.remove('active-row');
-                row.classList.add('active-row');
-                lastSelectedRow = row;
-            };
+    function legalSearch() {
+        if (!lastSelectedRow) { alert("Please click/select a row in the table first."); return; }
+        const name = lastSelectedRow.querySelector('.name-input').value.trim();
+        let stateInput = lastSelectedRow.querySelector('.state-input').value.trim().toLowerCase();
+        if(!name) { alert("Please enter a name."); return; }
+        const stateMap = {
+            "alabama": "al", "alaska": "ak", "arizona": "az", "arkansas": "ar", "california": "ca",
+            "colorado": "co", "connecticut": "ct", "delaware": "de", "florida": "fl", "georgia": "ga",
+            "hawaii": "hi", "idaho": "id", "illinois": "il", "indiana": "in", "iowa": "ia",
+            "kansas": "ks", "kentucky": "ky", "louisiana": "la", "maine": "me", "maryland": "md",
+            "massachusetts": "ma", "michigan": "mi", "minnesota": "mn", "mississippi": "ms", "missouri": "mo",
+            "montana": "mt", "nebraska": "ne", "nevada": "nv", "new hampshire": "nh", "new jersey": "nj",
+            "new mexico": "nm", "new york": "ny", "north carolina": "nc", "north dakota": "nd", "ohio": "oh",
+            "oklahoma": "ok", "oregon": "or", "pennsylvania": "pa", "rhode island": "ri", "south carolina": "sc",
+            "south dakota": "sd", "tennessee": "tn", "texas": "tx", "utah": "ut", "vermont": "vt",
+            "virginia": "va", "washington": "wa", "west virginia": "wv", "wisconsin": "wi", "wyoming": "wy"
+        };
+        const stateParam = stateMap[stateInput] || stateInput;
+        const formattedName = encodeURIComponent(name.replace(/\s+/g, '-'));
+        const url = `https://trellis.law/cases/${formattedName}?state=${stateParam}&county=&matter_type=`;
+        window.open(url, '_blank');
+    }
 
-            let cellsHTML = `
-                <td><button class="btn btn-delete" onclick="removeRow(this)">✕</button></td>
-                <td><input type="text" class="name-input" placeholder="Name..." oninput="updateLinks(this)"></td>
-                <td><input type="text" class="city-input" placeholder="City" oninput="updateLinks(this)"></td>
-                <td><input type="text" class="state-input" placeholder="ST" oninput="updateLinks(this)"></td>
-                <td><input type="text" class="extra-input" placeholder="Keyword..." oninput="updateLinks(this)"></td>
-                <td><button class="btn btn-open-all" onclick="openAllInRow(this)" style="display:none">OPEN</button></td>
+    function finSearch(type) {
+        if (!lastSelectedRow) { alert("Please click/select a row in the table first."); return; }
+        const name = lastSelectedRow.querySelector('.name-input').value.trim();
+        if(!name) { alert("Please enter a username."); return; }
+        const handle = name.replace(/\s+/g, '');
+        let url = type === 'cash' ? `https://cash.app/$${handle}` : `https://paypal.com/paypalme/${handle}`;
+        window.open(url, '_blank');
+    }
+
+    /* HISTORY LOGIC */
+    function renderHistory() {
+        const history = JSON.parse(localStorage.getItem('ns_search_history') || '[]');
+        const container = document.getElementById('historyList');
+        container.innerHTML = '';
+        history.forEach((name, index) => {
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <span onclick="loadHistoryName('${name}')">${name}</span>
+                <div class="del-hist" onclick="deleteHistory(${index})">✕</div>
             `;
+            container.appendChild(item);
+        });
+    }
 
-            const isMain = document.getElementById('mainToggle').checked;
-            const isSub = document.getElementById('subToggle').checked;
+    function saveToHistory(name) {
+        if (!name) return;
+        let history = JSON.parse(localStorage.getItem('ns_search_history') || '[]');
+        history = history.filter(h => h.toLowerCase() !== name.toLowerCase());
+        history.unshift(name);
+        if (history.length > 10) history.pop();
+        localStorage.setItem('ns_search_history', JSON.stringify(history));
+        renderHistory();
+    }
 
-            for (let i = 0; i < 22; i++) {
-                let colClass = (i < 10) ? "main-col" : "sub-col";
-                let visible = (i < 10) ? isMain : isSub;
-                cellsHTML += `<td class="${colClass}" style="display: ${visible ? 'table-cell' : 'none'}"><a href="#" target="_blank" class="hidden-link">GO</a></td>`;
-            }
+    function deleteHistory(index) {
+        let history = JSON.parse(localStorage.getItem('ns_search_history') || '[]');
+        history.splice(index, 1);
+        localStorage.setItem('ns_search_history', JSON.stringify(history));
+        renderHistory();
+    }
 
-            row.innerHTML = cellsHTML;
-            tbody.appendChild(row);
-            updateCount();
-            if(shouldSave) saveToLocalStorage();
-            return row;
-        }
-
-        function updateLinks(input) {
-            const row = input.closest('tr');
-            const name = row.querySelector('.name-input').value.trim();
-            const city = row.querySelector('.city-input').value.trim();
-            const state = row.querySelector('.state-input').value.trim();
-            const extra = row.querySelector('.extra-input').value.trim();
-            const links = row.querySelectorAll('a');
-            const bulkBtn = row.querySelector('.btn-open-all');
-
-            if (name) {
-                bulkBtn.style.display = "block";
-                const queryParts = [name];
-                if (city) queryParts.push(city);
-                if (state) queryParts.push(state);
-                if (extra) queryParts.push(extra);
-                
-                const query = queryParts.join(", "); 
-                const enc = encodeURIComponent(query);
-
-                for (let i = 0; i < searchTemplates.length; i++) {
-                    let finalUrl;
-                    if (i === 4) { // LinkedIn
-                        const baseName = encodeURIComponent(name);
-                        let stVal = state.trim().toLowerCase();
-                        const geoMap = {"al": "104514075", "ak": "103991206", "az": "104193321", "ar": "105658826", "ca": "102095887", "co": "100913221", "ct": "100742183", "de": "101683931", "fl": "101318387", "ga": "105370425", "hi": "104712771", "id": "104342207", "il": "106297371", "in": "100078170", "ia": "106880053", "ks": "106190547", "ky": "106170940", "la": "103752601", "me": "100589712", "md": "106412613", "ma": "101018698", "mi": "104764831", "mn": "104958045", "ms": "105221971", "mo": "100650570", "mt": "100630737", "ne": "103730999", "nv": "100799797", "nh": "101185038", "nj": "101217735", "nm": "101569426", "ny": "105080838", "nc": "104880996", "nd": "100819957", "oh": "104443421", "ok": "105634629", "or": "105151242", "pa": "103289047", "ri": "106424364", "sc": "104323608", "sd": "105476004", "tn": "106579246", "tx": "102748797", "ut": "102073993", "vt": "101662580", "va": "101026601", "wa": "103212711", "wv": "106144670", "wi": "101452733", "wy": "103294326"};
-                        const stateMap = {"alabama":"al","alaska":"ak","arizona":"az","arkansas":"ar","california":"ca","colorado":"co","connecticut":"ct","delaware":"de","florida":"fl","georgia":"ga","hawaii":"hi","idaho":"id","illinois":"il","indiana":"in","iowa":"ia","kansas":"ks","kentucky":"ky","louisiana":"la","maine":"me","maryland":"md","massachusetts":"ma","michigan":"mi","minnesota":"mn","mississippi":"ms","missouri":"mo","montana":"mt","nebraska":"ne","nevada":"nv","new hampshire":"nh","new jersey":"nj","new mexico":"nm","new york":"ny","north carolina":"nc","north dakota":"nd","ohio":"oh","oklahoma":"ok","oregon":"or","pennsylvania":"pa","rhode island":"ri","south carolina":"sc","south dakota":"sd","tennessee":"tn","texas":"tx","utah":"ut","vermont":"vt","virginia":"va","washington":"wa","west virginia":"wv","wisconsin":"wi","wyoming":"wy"};
-                        const cleanST = stateMap[stVal] || stVal;
-                        const geoId = geoMap[cleanST];
-                        finalUrl = geoId ? `https://www.linkedin.com/search/results/people/?keywords=${baseName}&origin=FACETED_SEARCH&geoUrn=%5B%22${geoId}%22%5D` : `https://www.linkedin.com/search/results/people/?keywords=${baseName}&origin=FACETED_SEARCH`;
-                    } else if (i === 2) { // Twitter
-                        finalUrl = searchTemplates[i] + enc + "&f=user";
-                    } else if (i === 18) { // Vimeo
-                        finalUrl = searchTemplates[i] + enc + "&type=people";
-                    } else {
-                        finalUrl = searchTemplates[i] + enc;
-                    }
-                    links[i].href = finalUrl;
-                    links[i].classList.remove('hidden-link');
-                }
-                // Venmo & Spotify
-                links[20].href = `https://account.venmo.com/u/${name.replace(/\s+/g, '-')}`;
-                links[20].classList.remove('hidden-link');
-                links[21].href = `https://open.spotify.com/search/${encodeURIComponent(name)}/users`;
-                links[21].classList.remove('hidden-link');
-
-                /* Save to History after typing pause */
-                if (input.classList.contains('name-input')) {
-                    clearTimeout(searchTimeout);
-                    searchTimeout = setTimeout(() => saveToHistory(name), 2000);
-                }
-
-            } else {
-                bulkBtn.style.display = "none";
-                links.forEach(l => l.classList.add('hidden-link'));
-            }
-            saveToLocalStorage();
-        }
-
-        function saveToLocalStorage() {
-            const rows = Array.from(document.querySelectorAll('#tableBody tr')).map(row => ({
-                name: row.querySelector('.name-input').value,
-                city: row.querySelector('.city-input').value,
-                state: row.querySelector('.state-input').value,
-                extra: row.querySelector('.extra-input').value
-            }));
-            localStorage.setItem('ns_si_data_v3', JSON.stringify(rows));
-        }
-
-        function loadFromLocalStorage() {
-            const saved = localStorage.getItem('ns_si_data_v3');
-            if (saved) {
-                const data = JSON.parse(saved);
-                if (data.length === 0) addRow();
-                else data.forEach(d => {
-                    const row = addRow(false);
-                    row.querySelector('.name-input').value = d.name;
-                    row.querySelector('.city-input').value = d.city;
-                    row.querySelector('.state-input').value = d.state;
-                    row.querySelector('.extra-input').value = d.extra || "";
-                    updateLinks(row.querySelector('.name-input'));
-                });
-            } else addRow();
-        }
-
-        function removeRow(btn) { btn.closest('tr').remove(); updateCount(); saveToLocalStorage(); }
-        function updateCount() { document.getElementById('rowCount').innerText = `${document.getElementById('tableBody').children.length} TARGETS LOADED`; }
+    function loadHistoryName(name) {
+        // Force a new row for every history click
+        const newRow = addRow(); 
+        const input = newRow.querySelector('.name-input');
+        input.value = name;
+        updateLinks(input);
         
-        function openAllInRow(btn) { 
-            btn.closest('tr').querySelectorAll('a:not(.hidden-link)').forEach(l => {
-                if (l.parentElement.style.display !== 'none') window.open(l.href, '_blank');
-            }); 
-        }
+        // Visual selection handling
+        if (lastSelectedRow) lastSelectedRow.classList.remove('active-row');
+        newRow.classList.add('active-row');
+        lastSelectedRow = newRow;
+    }
 
-        window.onload = () => {
-            updateHeaderNames();
-            loadFromLocalStorage();
-            renderHistory();
-            setTimeout(() => document.getElementById('loader-wrapper').style.display = 'none', 3500);
+    function addRow(shouldSave = true) {
+        const tbody = document.getElementById('tableBody');
+        const row = document.createElement('tr');
+        row.onclick = () => {
+            if(lastSelectedRow) lastSelectedRow.classList.remove('active-row');
+            row.classList.add('active-row');
+            lastSelectedRow = row;
         };
 
-        const canvas = document.getElementById("bg");
-        const ctx = canvas.getContext("2d");
-        let pts = [];
-        const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-        window.onresize = resize; resize();
-        for(let i=0; i<80; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*2, dx:Math.random()-0.5, dy:Math.random()-0.5});
-        function anim() {
-            ctx.clearRect(0,0,canvas.width,canvas.height);
-            pts.forEach(p => {
-                p.x+=p.dx; p.y+=p.dy;
-                if(p.x<0||p.x>canvas.width) p.dx*=-1; if(p.y<0||p.y>canvas.height) p.dy*=-1;
-                ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle="rgba(246,201,14,0.3)"; ctx.fill();
-            });
-            requestAnimationFrame(anim);
+        let cellsHTML = `
+            <td><button class="btn btn-delete" onclick="removeRow(this)">✕</button></td>
+            <td><input type="text" class="name-input" placeholder="Name..." oninput="updateLinks(this)"></td>
+            <td><input type="text" class="city-input" placeholder="City" oninput="updateLinks(this)"></td>
+            <td><input type="text" class="state-input" placeholder="ST" oninput="updateLinks(this)"></td>
+            <td><input type="text" class="extra-input" placeholder="Keyword..." oninput="updateLinks(this)"></td>
+            <td><button class="btn btn-open-all" onclick="openAllInRow(this)" style="display:none">OPEN</button></td>
+        `;
+
+        const isMain = document.getElementById('mainToggle').checked;
+        const isSub = document.getElementById('subToggle').checked;
+
+        for (let i = 0; i < 23; i++) {
+            let colClass = (i < 10) ? "main-col" : "sub-col";
+            let visible = (i < 10) ? isMain : isSub;
+            cellsHTML += `<td class="${colClass}" style="display: ${visible ? 'table-cell' : 'none'}"><a href="#" target="_blank" class="hidden-link">GO</a></td>`;
         }
-        anim();
-        document.addEventListener("contextmenu", e => e.preventDefault());
-        document.onkeydown = e => { if(e.keyCode===123 || (e.ctrlKey && e.shiftKey && (e.keyCode===73 || e.keyCode===74)) || (e.ctrlKey && e.keyCode===85)) e.preventDefault(); };
-    </script>
+
+        row.innerHTML = cellsHTML;
+        tbody.appendChild(row);
+        updateCount();
+        if(shouldSave) saveToLocalStorage();
+        return row;
+    }
+
+    function updateLinks(input) {
+        const row = input.closest('tr');
+        const name = row.querySelector('.name-input').value.trim();
+        const city = row.querySelector('.city-input').value.trim();
+        const state = row.querySelector('.state-input').value.trim();
+        const extra = row.querySelector('.extra-input').value.trim();
+        const links = row.querySelectorAll('a');
+        const bulkBtn = row.querySelector('.btn-open-all');
+
+        if (name) {
+            bulkBtn.style.display = "block";
+            const queryParts = [name];
+            if (city) queryParts.push(city);
+            if (state) queryParts.push(state);
+            if (extra) queryParts.push(extra);
+            
+            const query = queryParts.join(", "); 
+            const enc = encodeURIComponent(query);
+
+            for (let i = 0; i < searchTemplates.length; i++) {
+                let finalUrl;
+                if (i === 4) { // LinkedIn
+                    const baseName = encodeURIComponent(name);
+                    let stVal = state.trim().toLowerCase();
+                    const geoMap = {"al": "104514075", "ak": "103991206", "az": "104193321", "ar": "105658826", "ca": "102095887", "co": "100913221", "ct": "100742183", "de": "101683931", "fl": "101318387", "ga": "105370425", "hi": "104712771", "id": "104342207", "il": "106297371", "in": "100078170", "ia": "106880053", "ks": "106190547", "ky": "106170940", "la": "103752601", "me": "100589712", "md": "106412613", "ma": "101018698", "mi": "104764831", "mn": "104958045", "ms": "105221971", "mo": "100650570", "mt": "100630737", "ne": "103730999", "nv": "100799797", "nh": "101185038", "nj": "101217735", "nm": "101569426", "ny": "105080838", "nc": "104880996", "nd": "100819957", "oh": "104443421", "ok": "105634629", "or": "105151242", "pa": "103289047", "ri": "106424364", "sc": "104323608", "sd": "105476004", "tn": "106579246", "tx": "102748797", "ut": "102073993", "vt": "101662580", "va": "101026601", "wa": "103212711", "wv": "106144670", "wi": "101452733", "wy": "103294326"};
+                    const stateMap = {"alabama":"al","alaska":"ak","arizona":"az","arkansas":"ar","california":"ca","colorado":"co","connecticut":"ct","delaware":"de","florida":"fl","georgia":"ga","hawaii":"hi","idaho":"id","illinois":"il","indiana":"in","iowa":"ia","kansas":"ks","kentucky":"ky","louisiana":"la","maine":"me","maryland":"md","massachusetts":"ma","michigan":"mi","minnesota":"mn","mississippi":"ms","missouri":"mo","montana":"mt","nebraska":"ne","nevada":"nv","new hampshire":"nh","new jersey":"nj","new mexico":"nm","new york":"ny","north carolina":"nc","north dakota":"nd","ohio":"oh","oklahoma":"ok","oregon":"or","pennsylvania":"pa","rhode island":"ri","south carolina":"sc","south dakota":"sd","tennessee":"tn","texas":"tx","utah":"ut","vermont":"vt","virginia":"va","washington":"wa","west virginia":"wv","wisconsin":"wi","wyoming":"wy"};
+                    const cleanST = stateMap[stVal] || stVal;
+                    const geoId = geoMap[cleanST];
+                    finalUrl = geoId ? `https://www.linkedin.com/search/results/people/?keywords=${baseName}&origin=FACETED_SEARCH&geoUrn=%5B%22${geoId}%22%5D` : `https://www.linkedin.com/search/results/people/?keywords=${baseName}&origin=FACETED_SEARCH`;
+                } else if (i === 2) { // Twitter
+                    finalUrl = searchTemplates[i] + enc + "&f=user";
+                } else if (i === 18) { // Vimeo
+                    finalUrl = searchTemplates[i] + enc + "&type=people";
+                } else {
+                    finalUrl = searchTemplates[i] + enc;
+                }
+                links[i].href = finalUrl;
+                links[i].classList.remove('hidden-link');
+            }
+
+            links[20].href = `https://account.venmo.com/u/${name.replace(/\s+/g, '-')}`;
+            links[20].classList.remove('hidden-link');
+            links[21].href = `https://open.spotify.com/search/$${encodeURIComponent(name)}/users`;
+            links[21].classList.remove('hidden-link');
+            links[22].href = `https://bsky.app/search?q=${enc}`;
+            links[22].classList.remove('hidden-link');
+
+            if (input.classList.contains('name-input')) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => saveToHistory(name), 2000);
+            }
+        } else {
+            bulkBtn.style.display = "none";
+            links.forEach(l => l.classList.add('hidden-link'));
+        }
+        saveToLocalStorage();
+    }
+
+    function saveToLocalStorage() {
+        const rows = Array.from(document.querySelectorAll('#tableBody tr')).map(row => ({
+            name: row.querySelector('.name-input').value,
+            city: row.querySelector('.city-input').value,
+            state: row.querySelector('.state-input').value,
+            extra: row.querySelector('.extra-input').value
+        }));
+        localStorage.setItem('ns_si_data_v3', JSON.stringify(rows));
+    }
+
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem('ns_si_data_v3');
+        if (saved) {
+            const data = JSON.parse(saved);
+            if (data.length === 0) addRow();
+            else data.forEach(d => {
+                const row = addRow(false);
+                row.querySelector('.name-input').value = d.name;
+                row.querySelector('.city-input').value = d.city;
+                row.querySelector('.state-input').value = d.state;
+                row.querySelector('.extra-input').value = d.extra || "";
+                updateLinks(row.querySelector('.name-input'));
+            });
+        } else addRow();
+    }
+
+    function removeRow(btn) { btn.closest('tr').remove(); updateCount(); saveToLocalStorage(); }
+    function updateCount() { document.getElementById('rowCount').innerText = `${document.getElementById('tableBody').children.length} TARGETS LOADED`; }
+    
+    function openAllInRow(btn) { 
+        btn.closest('tr').querySelectorAll('a:not(.hidden-link)').forEach(l => {
+            if (l.parentElement.style.display !== 'none') window.open(l.href, '_blank');
+        }); 
+    }
+
+    window.onload = () => {
+        updateHeaderNames();
+        loadFromLocalStorage();
+        renderHistory();
+        setTimeout(() => document.getElementById('loader-wrapper').style.display = 'none', 3500);
+    };
+
+    const canvas = document.getElementById("bg");
+    const ctx = canvas.getContext("2d");
+    let pts = [];
+    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
+    window.onresize = resize; resize();
+    for(let i=0; i<80; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*2, dx:Math.random()-0.5, dy:Math.random()-0.5});
+    function anim() {
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        pts.forEach(p => {
+            p.x+=p.dx; p.y+=p.dy;
+            if(p.x<0||p.x>canvas.width) p.dx*=-1; if(p.y<0||p.y>canvas.height) p.dy*=-1;
+            ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle="rgba(246,201,14,0.3)"; ctx.fill();
+        });
+        requestAnimationFrame(anim);
+    }
+    anim();
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.onkeydown = e => { if(e.keyCode===123 || (e.ctrlKey && e.shiftKey && (e.keyCode===73 || e.keyCode===74)) || (e.ctrlKey && e.keyCode===85)) e.preventDefault(); };
+</script>
 </body>
 </html>
