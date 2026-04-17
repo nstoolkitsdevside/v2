@@ -670,24 +670,66 @@
         setTimeout(() => document.getElementById('loader-wrapper').style.display = 'none', 3500);
     };
 
-    const canvas = document.getElementById("bg");
-    const ctx = canvas.getContext("2d");
-    let pts = [];
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    window.onresize = resize; resize();
-    for(let i=0; i<80; i++) pts.push({x:Math.random()*canvas.width, y:Math.random()*canvas.height, r:Math.random()*2, dx:Math.random()-0.5, dy:Math.random()-0.5});
-    function anim() {
-        ctx.clearRect(0,0,canvas.width,canvas.height);
-        pts.forEach(p => {
-            p.x+=p.dx; p.y+=p.dy;
-            if(p.x<0||p.x>canvas.width) p.dx*=-1; if(p.y<0||p.y>canvas.height) p.dy*=-1;
-            ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2); ctx.fillStyle="rgba(246,201,14,0.3)"; ctx.fill();
-        });
-        requestAnimationFrame(anim);
+    // Canvas animation logic preserved below...
+        // Canvas animation logic preserved
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+let pts = [];
+
+const resize = () => { 
+    canvas.width = window.innerWidth; 
+    canvas.height = window.innerHeight; 
+};
+window.onresize = resize; 
+resize();
+
+for(let i=0; i<80; i++) {
+    pts.push({
+        x: Math.random() * canvas.width, 
+        y: Math.random() * canvas.height, 
+        r: Math.random() * 2, 
+        dx: Math.random() - 0.5, 
+        dy: Math.random() - 0.5
+    });
+}
+
+function anim() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    pts.forEach(p => {
+        p.x += p.dx; p.y += p.dy;
+        if(p.x < 0 || p.x > canvas.width) p.dx *= -1; 
+        if(p.y < 0 || p.y > canvas.height) p.dy *= -1;
+        ctx.beginPath(); 
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); 
+        ctx.fillStyle = "rgba(246,201,14,0.3)"; 
+        ctx.fill();
+    });
+    requestAnimationFrame(anim);
+}
+anim();
+
+// --- Protection Logic ---
+
+// Disable Right Click
+document.addEventListener("contextmenu", e => e.preventDefault());
+
+// Disable Shortcuts
+document.onkeydown = e => {
+    // F12
+    if (e.keyCode === 123) return false;
+
+    // Ctrl + Shift + I (Inspect)
+    // Ctrl + Shift + J (Console)
+    // Ctrl + Shift + C (Element Selector)
+    if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+        return false;
     }
-    anim();
-    document.addEventListener("contextmenu", e => e.preventDefault());
-    document.onkeydown = e => { if(e.keyCode===123 || (e.ctrlKey && e.shiftKey && (e.keyCode===73 || e.keyCode===74)) || (e.ctrlKey && e.keyCode===85)) e.preventDefault(); };
+
+    // Ctrl + U (View Source)
+    if (e.ctrlKey && e.keyCode === 85) {
+        return false;
+    }
+};
 </script>
 </body>
 </html>
