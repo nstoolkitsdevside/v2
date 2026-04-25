@@ -550,3 +550,34 @@ footer {
     cursor: not-allowed;
     background: rgba(0,0,0,0.2) !important;
 }
+
+.sidebar-scroll {
+    flex: 1; 
+    min-height: 0;  
+    height: 100%; 
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding-right: 10px;
+}
+
+.sidebar-scroll::-webkit-scrollbar { 
+    width: 4px; 
+}
+.sidebar-scroll::-webkit-scrollbar-track { 
+    background: rgba(0,0,0,0.2); 
+    border-radius: 10px; 
+}
+.sidebar-scroll::-webkit-scrollbar-thumb { 
+    background: rgba(246, 201, 14, 0.5); 
+    border-radius: 10px; 
+}
+
+.no-spinners::-webkit-outer-spin-button,
+.no-spinners::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.no-spinners[type=number] {
+    -moz-appearance: textfield;
+}
