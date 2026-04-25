@@ -337,6 +337,20 @@
 			<button class="btn btn-crim" style="border-color: #00d4ff;" onclick="finSearch('cash')">CashApp ($)</button>
 			<button class="btn btn-crim" style="border-color: #00d4ff;" onclick="finSearch('paypal')">PayPal.me</button>
 			</div>
+			<div class="toggle-container">
+    <label style="font-size: 10px; cursor: pointer;" for="yelpToggle">Yelp Portal</label>
+    <label class="switch">
+        <input type="checkbox" id="yelpToggle" onchange="toggleSection('yelpSection', this.checked)">
+        <span class="slider"></span>
+    </label>
+</div>
+
+<div id="yelpSection" style="display: none; flex-direction: column; gap: 4px; border-left: 2px solid #ff0000; padding-left: 10px; margin-top: 5px;">
+    <p style="font-size: 9px; color: #FFFFFF; margin: 2px 0 6px 0; opacity: 0.8; line-height: 1.2;">
+        Direct Yelp Access. (Find friends via address book)
+    </p>
+    <button class="btn btn-crim" style="border-color: #ff0000; width: 100%;" onclick="openYelpPortal()">Open Yelp Search</button>
+</div>
 			&nbsp;
 			<div class="history-container">
 			<label>Recent Searches</label>
@@ -597,7 +611,20 @@ const searchTemplates = [
     bulkCols.forEach(col => {
         col.style.display = (mainOn || subOn) ? 'table-cell' : 'none';
     });
-}
+	}
+
+	function loadHistoryName(name) {
+        // Force a new row for every history click
+        const newRow = addRow(); 
+        const input = newRow.querySelector('.name-input');
+        input.value = name;
+        updateLinks(input);
+        
+        // Visual selection handling
+        if (lastSelectedRow) lastSelectedRow.classList.remove('active-row');
+        newRow.classList.add('active-row');
+        lastSelectedRow = newRow;
+    }
 
     function addRow(shouldSave = true) {
     const tbody = document.getElementById('tableBody');
@@ -806,6 +833,11 @@ document.onkeydown = e => {
         return false;
     }
 };
+</script>
+<script>
+function openYelpPortal() {
+    window.open("https://www.yelp.com/find_friends/address_book?fsid=LpiV-_mJLfXiPGsVN3Wkjw", "_blank");
+}
 </script>
 </body>
 </html>
