@@ -6,16 +6,19 @@
     <title>Template Writer</title>
     <link rel="icon" type="image/jpg" href="https://i.imgur.com/QWLMgK8.jpeg">
     <link rel="stylesheet" href="templatewriterstyle.css">
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/collapse@3.x.x/dist/cdn.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body x-data="{ 
     step: 1, 
     showToast: false,
     showQuickPreview: false,
+    showQuickUrl: false,
     ctrlTimer: null,
     matchType: '', 
     accountType: '',
     urls: [{ link: '' }],
+    ordNum: '',
     
     feats: {},
     sub: {
@@ -36,6 +39,18 @@
         same: { link1: '', obj: '', link2: '', net: '' },
         loc2: { link: '', title: '' },
         custom: ['', '', '', '', '']
+    },
+
+    scrollToDrawer(id) {
+        setTimeout(() => {
+            const el = document.getElementById(id);
+            if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // Optional: Flash the border slightly to draw the eye
+                el.style.borderColor = 'var(--accent)';
+                setTimeout(() => el.style.borderColor = 'rgba(246, 201, 14, 0.15)', 800);
+            }
+        }, 100);
     },
 
     get reportEngine() {
@@ -140,7 +155,19 @@
 
         if (this.feats.vm) {
             const v = this.sub.vm;
-            pf.push(v.seen && v.link && v.title ? `visual match ${getAso()} the # identified <a href='${v.link}' target='_blank'>${v.title}</a> account` : `visual match`);
+            if (v.seen) {
+                if (v.title && v.link) {
+                    pf.push(`visual match ${getAso()} the # identified <a href='${v.link}' target='_blank'>${v.title}</a> account`);
+                } else if (v.link) {
+                    pf.push(`visual match ${getAso()} the # identified <a href='${v.link}' target='_blank'>account</a>`); 
+                } else if (v.title) {
+                    pf.push(`visual match ${getAso()} the # identified ${v.title} account`);
+                } else {
+                    pf.push(`visual match ${getAso()}`); 
+                }
+            } else {
+                pf.push('visual match');
+            }
         }
 
         if (this.feats.user) {
@@ -256,20 +283,92 @@
             });
         }
 
+        const getOrdinal = (n) => {
+            let v = parseInt(n);
+            if (!v || isNaN(v)) return ''; // Return blank if empty
+            let mod100 = v % 100;
+            // Catch 11th, 12th, 13th, otherwise use standard st, nd, rd, th
+            let suffix = (mod100 >= 10 && mod100 <= 20) ? 'th' : ['th', 'st', 'nd', 'rd', 'th', 'th', 'th', 'th', 'th', 'th'][v % 10];
+            return v + suffix + ' ';
+        };
+
+        let ordText = getOrdinal(this.ordNum); 
+        
+        html = html.replace(/the # identified/g, `the ${ordText}identified`);
+
         return html;
     }
 }"
-@keydown.window="if($event.key === 'Control' && !ctrlTimer) { ctrlTimer = setTimeout(() => { showQuickPreview = true; }, 500); }"
+@keydown.window="if($event.key === 'Control' && !ctrlTimer) { ctrlTimer = setTimeout(() => { showQuickPreview = true; }, 1500); }"
 @keyup.window="if($event.key === 'Control') { clearTimeout(ctrlTimer); ctrlTimer = null; showQuickPreview = false; }">
 
-    <div class="navbar">
+<div class="navbar" style="position: relative;">
         <div class="nav-inner">
+            <div class="nav-left">
             <div class="nav-left"><a href="https://nstoolkits.site/v3/" style="text-decoration: none; color: inherit;"><h1>NS Toolkits v3</h1></a></div>
+            </div>
             <div class="nav-menu">
-              <a href="https://nstoolkits.site/v3/">Home</a>
+            <a href="https://nstoolkits.site/v3/">Home</a>
             <a href="https://nstoolkits.site/v3/about.html">About Us</a>
-         <a href="https://nstoolkits.site/v3/download.html">Metascraper</a>
+            <a href="https://nstoolkits.site/v3/download.html">Metascraper</a>
             <a href="https://nstoolkits.site/">Version 2</a>
+            </div>
+        </div>
+
+        <div style="position: absolute; top: 100%; left: 0; right: 0; display: flex; flex-direction: column; align-items: center; z-index: 90; pointer-events: none;">
+            
+            <div style="width: 100%; max-width: 800px; display: flex; flex-direction: column; align-items: center; pointer-events: auto;" @click.outside="showQuickUrl = false">
+                
+                <div x-show="showQuickUrl" 
+                     x-collapse 
+                     style="width: 100%; background: rgba(15, 15, 15, 0.95); backdrop-filter: blur(20px); border: 1px solid rgba(246, 201, 14, 0.2); border-top: none; border-radius: 0 0 16px 16px; box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 0 20px rgba(246, 201, 14, 0.05); padding: 25px;">
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px;">
+                        <h3 style="margin: 0; color: var(--accent); font-size: 14px; text-transform: uppercase; letter-spacing: 1.5px;">Global Link Manager</h3>
+                        <span style="font-size: 11px; color: #aaa; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 20px;">Changes sync across all steps</span>
+                    </div>
+
+                    <div style="display: flex; flex-direction: column; gap: 12px;">
+                        <template x-for="(u, index) in urls" :key="index">
+                            <div style="display: flex; gap: 12px; align-items: center; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                                
+                                <div style="display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.05); border-radius: 4px; width: 26px; height: 26px; color: #777; font-size: 11px; font-weight: bold;" x-text="index + 1"></div>
+
+                                <input type="text" x-model="u.link" placeholder="https://..." 
+                                       class="drawer-input" style="flex: 1; max-width: none; height: 35px; font-size: 14px; background: transparent !important; border: none !important; box-shadow: none !important; padding: 0;">
+                                
+                                <button @click="u.link = u.link.includes('www.') ? u.link.replace('www.', '') : (u.link.includes('://') ? u.link.replace('://', '://www.') : 'www.' + u.link)"
+                                        class="slider-btn" 
+                                        style="padding: 0 15px; height: 35px; font-size: 14px; white-space: nowrap; border-radius: 8px;"
+                                        :style="u.link.includes('www.') ? 'background: rgba(246, 201, 14, 0.15); border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(246, 201, 14, 0.2);' : ''">
+                                    www.
+                                </button>
+
+                                <button x-show="urls.length > 1" @click="urls.splice(index, 1)" 
+                                        style="background: rgba(231, 76, 60, 0.1); border: 1px solid rgba(231, 76, 60, 0.2); color: #e74c3c; border-radius: 6px; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s;"
+                                        onmouseover="this.style.background='rgba(231, 76, 60, 0.2)'" onmouseout="this.style.background='rgba(231, 76, 60, 0.1)'">
+                                    ✖
+                                </button>
+                            </div>
+                        </template>
+                        
+                        <button @click="urls.push({link: ''})" 
+                                style="background: rgba(255,255,255,0.02); border: 1px dashed rgba(255,255,255,0.15); color: #ccc; padding: 12px; border-radius: 8px; cursor: pointer; font-size: 12px; transition: 0.2s; width: 100%; font-weight: bold; margin-top: 5px;"
+                                onmouseover="this.style.borderColor='var(--accent)'; this.style.color='var(--accent)'; this.style.background='rgba(246, 201, 14, 0.05)';"
+                                onmouseout="this.style.borderColor='rgba(255,255,255,0.15)'; this.style.color='#ccc'; this.style.background='rgba(255,255,255,0.02)';">
+                            + ADD ANOTHER URL
+                        </button>
+                    </div>
+                </div>
+
+                <button @click="showQuickUrl = !showQuickUrl" 
+                        style="background: rgba(20,20,20,0.85); backdrop-filter: blur(12px); border: 1px solid rgba(246, 201, 14, 0.2); border-top: none; padding: 6px 20px; border-radius: 0 0 12px 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 10px 20px rgba(0,0,0,0.5); transition: 0.3s; margin-top: -1px;"
+                        onmouseover="this.style.background='rgba(30,30,30,0.95)'; this.style.padding='6px 25px';"
+                        onmouseout="this.style.background='rgba(20,20,20,0.85)'; this.style.padding='6px 20px';">
+                    <span style="color: var(--accent); font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px;">URL Manager</span>
+                    <span x-text="showQuickUrl ? '▲' : '▼'" style="font-size: 9px; color: #fff;"></span>
+                </button>
+
             </div>
         </div>
     </div>
@@ -316,6 +415,267 @@
                 <div style="font-size: 16px; line-height: 1.6; font-family: 'Segoe UI', sans-serif;" x-html="reportEngine"></div>
              </div>
          </div>
+    </div>
+    
+    <div x-show="step === 3"
+         x-transition:enter="transition ease-out duration-300 delay-100"
+         x-transition:enter-start="opacity-0 -translate-x-10"
+         x-transition:enter-end="opacity-100 translate-x-0"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100 translate-x-0"
+         x-transition:leave-end="opacity-0 -translate-x-10"
+         style="position: fixed; top: 100px; left: 20px; bottom: 100px; width: 340px; background: rgba(15, 15, 15, 0.85); backdrop-filter: blur(15px); border: 1px solid rgba(246, 201, 14, 0.2); border-radius: 16px; padding: 20px 10px 20px 20px; z-index: 80; box-shadow: 0 10px 40px rgba(0,0,0,0.7); display: flex; flex-direction: column; overflow: hidden; pointer-events: auto;">
+        
+        <h3 style="margin: 0 10px 15px 0; color: var(--accent); font-size: 13px; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; flex-shrink: 0;">Modifiers & Details</h3>
+        
+        <div class="sidebar-scroll">
+            
+<div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 10px 15px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px;">
+    <div style="display: flex; flex-direction: column;">
+        <span style="font-size: 11px; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">Identified Account #</span>
+        <span style="font-size: 9px; color: #666;">(Leave blank for default)</span>
+    </div>
+    <input type="number" 
+           class="drawer-input no-spinners" 
+           placeholder="#" 
+           x-model="ordNum" 
+           min="1" 
+           max="999"
+           oninput="if(this.value.length > 3) this.value = this.value.slice(0,3);"
+           style="width: 60px; min-width: 60px; height: 35px; text-align: center; font-weight: bold; flex: none; margin: 0;">
+</div>
+
+            <div x-show="!Object.values(feats).some(v => v)" style="display: flex; align-items: center; justify-content: center; height: 120px; border: 1px dashed rgba(255,255,255,0.15); border-radius: 10px; color: rgba(255,255,255,0.4); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; text-align: center; padding: 20px; margin-bottom: 15px;">
+                Select identifiers to reveal options
+            </div>
+
+            <div style="display: flex; flex-direction: column; gap: 15px; padding-bottom: 20px;">
+                
+                <template x-if="feats.fname || feats.mname || feats.lname">
+                    <div id="drawer-names" class="details-drawer" x-transition>
+                        <strong>Name Modifiers</strong>
+                        <div style="display: flex; gap: 15px; width: 100%; flex-wrap: wrap;">
+                            <div x-show="feats.fname" class="name-mod-group">
+                                <span style="font-size: 11px; color: #aaa; text-transform: uppercase;">First Name</span>
+                                <div class="custom-toggle"><input type="checkbox" id="afname" x-model="sub.names.afname"><label for="afname">Alias</label></div>
+                                <div class="custom-toggle"><input type="checkbox" id="ifname" x-model="sub.names.ifname"><label for="ifname">Initial</label></div>
+                            </div>
+                            <div x-show="feats.mname" class="name-mod-group">
+                                <span style="font-size: 11px; color: #aaa; text-transform: uppercase;">Middle Name</span>
+                                <div class="custom-toggle"><input type="checkbox" id="amname" x-model="sub.names.amname"><label for="amname">Alias</label></div>
+                                <div class="custom-toggle"><input type="checkbox" id="imname" x-model="sub.names.imname"><label for="imname">Initial</label></div>
+                            </div>
+                            <div x-show="feats.lname" class="name-mod-group">
+                                <span style="font-size: 11px; color: #aaa; text-transform: uppercase;">Last Name</span>
+                                <div class="custom-toggle"><input type="checkbox" id="alname" x-model="sub.names.alname"><label for="alname">Alias</label></div>
+                                <div class="custom-toggle"><input type="checkbox" id="ilname" x-model="sub.names.ilname"><label for="ilname">Initial</label></div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="feats.dob">
+                    <div id="drawer-dob" class="details-drawer" x-transition>
+                        <strong>Date of Birth Details</strong>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seendob" x-model="sub.dob.seen"><label for="seendob">As Seen On</label></div>
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.dob.link">
+                        <input type="text" class="drawer-input" placeholder="Custom Title" x-model="sub.dob.title">
+                        <input type="text" class="drawer-input" placeholder="Database Name" x-model="sub.dob.acc">
+                    </div>
+                </template>
+
+                <template x-if="feats.age">
+                    <div id="drawer-age" class="details-drawer" x-transition>
+                        <strong>Age Details</strong>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="basedage" x-model="sub.age.edu"><label for="basedage">Education Base</label></div>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenage" x-model="sub.age.seen"><label for="seenage">As Seen On</label></div>
+                        <input type="text" class="drawer-input" placeholder="Custom Title" x-model="sub.age.title" x-show="sub.age.seen">
+                    </div>
+                </template>
+
+                <template x-if="feats.loc">
+                    <div id="drawer-loc" class="details-drawer" x-transition>
+                        <strong>Location Details</strong>
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%;">
+                            <div class="custom-toggle"><input type="checkbox" id="prevloc" x-model="sub.loc.prev"><label for="prevloc">Previous</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="basedrel" x-model="sub.loc.rel"><label for="basedrel">Via Relative</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="basedcli" x-model="sub.loc.cli"><label for="basedcli">Via Client</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="seenloc" x-model="sub.loc.seen"><label for="seenloc">As Seen On</label></div>
+                        </div>
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.loc.link">
+                        <input type="text" class="drawer-input" placeholder="Custom Title" x-model="sub.loc.title">
+                        <input type="text" class="drawer-input" placeholder="Relative Link" x-model="sub.loc.relLnk" x-show="sub.loc.rel">
+                        <input type="text" class="drawer-input" placeholder="Relative Name" x-model="sub.loc.relNm" x-show="sub.loc.rel">
+                    </div>
+                </template>
+
+                <template x-if="feats.sch">
+                    <div id="drawer-sch" class="details-drawer" x-transition>
+                        <strong>School Details</strong>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seensch" x-model="sub.sch.seen"><label for="seensch">As Seen On</label></div>
+                        <input type="text" class="drawer-input" placeholder="School Name" x-model="sub.sch.name">
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.sch.link" x-show="sub.sch.seen">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.sch.title" x-show="sub.sch.seen">
+                    </div>
+                </template>
+
+                <template x-if="feats.phn">
+                    <div id="drawer-phn" class="details-drawer" x-transition>
+                        <strong>Phone Details</strong>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenphn" x-model="sub.phn.seen"><label for="seenphn">As Seen On</label></div>
+                        <input type="text" class="drawer-input" placeholder="Phone Number" x-model="sub.phn.num">
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.phn.link" x-show="sub.phn.seen">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.phn.title" x-show="sub.phn.seen">
+                    </div>
+                </template>
+
+                <template x-if="feats.mail">
+                    <div id="drawer-mail" class="details-drawer" x-transition>
+                        <strong>Email Details</strong>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="usrmai" x-model="sub.mail.usr"><label for="usrmai">Username</label></div>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenmai" x-model="sub.mail.seen"><label for="seenmai">As Seen On</label></div>
+                        <input type="text" class="drawer-input" placeholder="Email Address" x-model="sub.mail.addr">
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.mail.link" x-show="sub.mail.seen || sub.mail.usr">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.mail.title" x-show="sub.mail.seen || sub.mail.usr">
+                    </div>
+                </template>
+
+                <template x-if="feats.wrk">
+                    <div id="drawer-wrk" class="details-drawer" x-transition>
+                        <strong>Nature of Work Details</strong>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenwrk" x-model="sub.wrk.seen"><label for="seenwrk">As Seen On</label></div>
+                        <input type="text" class="drawer-input" placeholder="Nature of Work" x-model="sub.wrk.nat">
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.wrk.link" x-show="sub.wrk.seen">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.wrk.title" x-show="sub.wrk.seen">
+                    </div>
+                </template>
+
+                <template x-if="feats.emp">
+                    <div id="drawer-emp" class="details-drawer" x-transition>
+                        <strong>Employment Details</strong>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenemp" x-model="sub.emp.seen"><label for="seenemp">As Seen On</label></div>
+                        <input type="text" class="drawer-input" placeholder="Company Name" x-model="sub.emp.name">
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.emp.link" x-show="sub.emp.seen">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.emp.title" x-show="sub.emp.seen">
+                    </div>
+                </template>
+
+                <template x-if="feats.rel">
+                    <div id="drawer-rel" class="details-drawer" x-transition>
+                        <strong>Relative Details</strong>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenrel" x-model="sub.rel.seen"><label for="seenrel">As Seen On</label></div>
+                        <input type="text" class="drawer-input" placeholder="Relative Name" x-model="sub.rel.name">
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.rel.link" x-show="sub.rel.seen">
+                        <input type="text" class="drawer-input" placeholder="Database Name" x-model="sub.rel.title" x-show="sub.rel.seen">
+                    </div>
+                </template>
+
+                <template x-if="feats.vm">
+                    <div id="drawer-vm" class="details-drawer" x-transition>
+                        <strong>Visual Match Details</strong>
+                        <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenvm" x-model="sub.vm.seen"><label for="seenvm">As Seen On</label></div>
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.vm.link" x-show="sub.vm.seen">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.vm.title" x-show="sub.vm.seen">
+                    </div>
+                </template>
+
+                <template x-if="feats.user">
+                    <div id="drawer-user" class="details-drawer" x-transition>
+                        <strong>Username Details</strong>
+                        <input type="text" class="drawer-input" placeholder="Username" x-model="sub.user.txt">
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.user.link">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.user.title">
+                    </div>
+                </template>
+
+                <template x-if="feats.linked">
+                    <div id="drawer-linked" class="details-drawer" x-transition>
+                        <strong>Linked Details</strong>
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.linked.link">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.linked.title">
+                    </div>
+                </template>
+
+                <template x-if="feats.conn">
+                    <div id="drawer-conn" class="details-drawer" x-transition style="flex-direction: column; align-items: flex-start;">
+                        <strong>Connection Settings</strong>
+                        
+                        <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                            <div class="custom-toggle">
+                                <input type="checkbox" id="ismtf" x-model="sub.conn.friend" :disabled="sub.conn.following || sub.conn.follower || sub.conn.connected">
+                                <label for="ismtf">Friend</label>
+                            </div>
+                            <div class="custom-toggle">
+                                <input type="checkbox" id="isfo1" x-model="sub.conn.following" :disabled="sub.conn.friend || sub.conn.follower || sub.conn.connected">
+                                <label for="isfo1">Following</label>
+                            </div>
+                            <div class="custom-toggle">
+                                <input type="checkbox" id="isfo2" x-model="sub.conn.follower" :disabled="sub.conn.friend || sub.conn.following || sub.conn.connected">
+                                <label for="isfo2">Follower</label>
+                            </div>
+                            <div class="custom-toggle">
+                                <input type="checkbox" id="iscon" x-model="sub.conn.connected" :disabled="sub.conn.friend || sub.conn.following || sub.conn.follower">
+                                <label for="iscon">Connected</label>
+                            </div>
+                            <div class="custom-toggle">
+                                <input type="checkbox" id="seencon" x-model="sub.conn.seen" :disabled="(sub.conn.friend && sub.conn.own) || sub.conn.following || sub.conn.follower || sub.conn.connected">
+                                <label for="seencon">As Seen On</label>
+                            </div>
+                            <div class="custom-toggle">
+                                <input type="checkbox" id="owncon" x-model="sub.conn.own" :disabled="sub.conn.friend && sub.conn.seen">
+                                <label for="owncon">Own</label>
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap;">
+                            <input type="text" class="drawer-input" placeholder="Platform (e.g. FB)" x-model="sub.conn.net" :disabled="sub.conn.own || sub.conn.friend">
+                            <input type="text" class="drawer-input" placeholder="Platform Hyperlink" x-model="sub.conn.netL" :disabled="sub.conn.own || sub.conn.friend">
+                            
+                            <input type="text" class="drawer-input" placeholder="Their Connection" x-model="sub.conn.id" :disabled="sub.conn.own || sub.conn.friend">
+                            <input type="text" class="drawer-input" placeholder="Connection Link 1" x-model="sub.conn.link1" :disabled="sub.conn.own || sub.conn.friend">
+                            
+                            <input type="text" class="drawer-input" placeholder="Connection Name" x-model="sub.conn.name" :disabled="sub.conn.own">
+                            <input type="text" class="drawer-input" placeholder="Connection Link 2" x-model="sub.conn.link2" :disabled="sub.conn.own">
+                        </div>
+                        
+                        <div style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap;" x-show="sub.conn.seen || sub.conn.own">
+                            <input type="text" class="drawer-input" placeholder="Identified Network Link" x-model="sub.conn.accLink" :disabled="!sub.conn.own && (sub.conn.following || sub.conn.follower || sub.conn.connected)">
+                            <input type="text" class="drawer-input" placeholder="Identified Network Name" x-model="sub.conn.title" :disabled="!sub.conn.own && (sub.conn.following || sub.conn.follower || sub.conn.connected)">
+                        </div>
+                    </div>
+                </template>
+
+                <template x-if="feats.same">
+                    <div id="drawer-same" class="details-drawer" x-transition>
+                        <strong>Same Object Details</strong>
+                        <input type="text" class="drawer-input" placeholder="What Object?" x-model="sub.same.obj">
+                        <input type="text" class="drawer-input" placeholder="Object Link" x-model="sub.same.link1">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.same.net">
+                        <input type="text" class="drawer-input" placeholder="Network Link" x-model="sub.same.link2">
+                    </div>
+                </template>
+
+                <template x-if="feats.loc2">
+                    <div id="drawer-loc2" class="details-drawer" x-transition>
+                        <strong>Exact Location Details</strong>
+                        <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.loc2.link">
+                        <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.loc2.title">
+                    </div>
+                </template>
+
+                <template x-if="feats.custom">
+                    <div id="drawer-custom" class="details-drawer custom-drawer" x-transition>
+                        <strong>Custom Identifiers</strong>
+                        <input type="text" class="drawer-input" placeholder="Custom Identifier 1" x-model="sub.custom[0]">
+                        <input type="text" class="drawer-input" placeholder="Custom Identifier 2" x-model="sub.custom[1]">
+                        <input type="text" class="drawer-input" placeholder="Custom Identifier 3" x-model="sub.custom[2]">
+                        <input type="text" class="drawer-input" placeholder="Custom Identifier 4" x-model="sub.custom[3]">
+                        <input type="text" class="drawer-input" placeholder="Custom Identifier 5" x-model="sub.custom[4]">
+                    </div>
+                </template>
+
+            </div>
+        </div>
     </div>
 
     <div class="slider-wrapper">
@@ -440,260 +800,39 @@
                             <div class="custom-toggle"><input type="checkbox" id="alias" x-model="feats.alias"><label for="alias">Alias</label></div>
                             <div class="custom-toggle"><input type="checkbox" id="business" x-model="feats.business"><label for="business">Business Name</label></div>
 
-                            <div class="custom-toggle"><input type="checkbox" id="fname" x-model="feats.fname"><label for="fname">First Name</label></div>
-                            <div class="custom-toggle"><input type="checkbox" id="mname" x-model="feats.mname"><label for="mname">Middle Name</label></div>
-                            <div class="custom-toggle"><input type="checkbox" id="lname" x-model="feats.lname"><label for="lname">Last Name</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="fname" x-model="feats.fname" @change="if(feats.fname) scrollToDrawer('drawer-names')"><label for="fname">First Name</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="mname" x-model="feats.mname" @change="if(feats.mname) scrollToDrawer('drawer-names')"><label for="mname">Middle Name</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="lname" x-model="feats.lname" @change="if(feats.lname) scrollToDrawer('drawer-names')"><label for="lname">Last Name</label></div>
                             
-                            <template x-if="feats.fname || feats.mname || feats.lname">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Name Modifiers</strong>
-                                    <div style="display: flex; gap: 15px; width: 100%; flex-wrap: wrap;">
-                                        <div x-show="feats.fname" class="name-mod-group">
-                                            <span style="font-size: 12px; color: #aaa; text-transform: uppercase;">First Name</span>
-                                            <div class="custom-toggle"><input type="checkbox" id="afname" x-model="sub.names.afname"><label for="afname">Alias</label></div>
-                                            <div class="custom-toggle"><input type="checkbox" id="ifname" x-model="sub.names.ifname"><label for="ifname">Initial</label></div>
-                                        </div>
-                                        <div x-show="feats.mname" class="name-mod-group">
-                                            <span style="font-size: 12px; color: #aaa; text-transform: uppercase;">Middle Name</span>
-                                            <div class="custom-toggle"><input type="checkbox" id="amname" x-model="sub.names.amname"><label for="amname">Alias</label></div>
-                                            <div class="custom-toggle"><input type="checkbox" id="imname" x-model="sub.names.imname"><label for="imname">Initial</label></div>
-                                        </div>
-                                        <div x-show="feats.lname" class="name-mod-group">
-                                            <span style="font-size: 12px; color: #aaa; text-transform: uppercase;">Last Name</span>
-                                            <div class="custom-toggle"><input type="checkbox" id="alname" x-model="sub.names.alname"><label for="alname">Alias</label></div>
-                                            <div class="custom-toggle"><input type="checkbox" id="ilname" x-model="sub.names.ilname"><label for="ilname">Initial</label></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="dob1" x-model="feats.dob"><label for="dob1">Date of Birth</label></div>
-                            <template x-if="feats.dob">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Date of Birth Details</strong>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seendob" x-model="sub.dob.seen"><label for="seendob">As Seen On</label></div>
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.dob.link">
-                                    <input type="text" class="drawer-input" placeholder="Custom Title" x-model="sub.dob.title">
-                                    <input type="text" class="drawer-input" placeholder="Database Name" x-model="sub.dob.acc">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="age1" x-model="feats.age"><label for="age1">Age</label></div>
-                            <template x-if="feats.age">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Age Details</strong>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="basedage" x-model="sub.age.edu"><label for="basedage">Education Base</label></div>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenage" x-model="sub.age.seen"><label for="seenage">As Seen On</label></div>
-                                    <input type="text" class="drawer-input" placeholder="Custom Title" x-model="sub.age.title" x-show="sub.age.seen">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="location" x-model="feats.loc"><label for="location">Location</label></div>
-                            <template x-if="feats.loc">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Location Details</strong>
-                                    <div style="display: flex; gap: 10px; flex-wrap: wrap; width: 100%;">
-                                        <div class="custom-toggle"><input type="checkbox" id="prevloc" x-model="sub.loc.prev"><label for="prevloc">Previous</label></div>
-                                        <div class="custom-toggle"><input type="checkbox" id="basedrel" x-model="sub.loc.rel"><label for="basedrel">Via Relative</label></div>
-                                        <div class="custom-toggle"><input type="checkbox" id="basedcli" x-model="sub.loc.cli"><label for="basedcli">Via Client</label></div>
-                                        <div class="custom-toggle"><input type="checkbox" id="seenloc" x-model="sub.loc.seen"><label for="seenloc">As Seen On</label></div>
-                                    </div>
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.loc.link">
-                                    <input type="text" class="drawer-input" placeholder="Custom Title" x-model="sub.loc.title">
-                                    <input type="text" class="drawer-input" placeholder="Relative Link" x-model="sub.loc.relLnk" x-show="sub.loc.rel">
-                                    <input type="text" class="drawer-input" placeholder="Relative Name" x-model="sub.loc.relNm" x-show="sub.loc.rel">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="school" x-model="feats.sch"><label for="school">School</label></div>
-                            <template x-if="feats.sch">
-                                <div class="details-drawer" x-transition>
-                                    <strong>School Details</strong>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seensch" x-model="sub.sch.seen"><label for="seensch">As Seen On</label></div>
-                                    <input type="text" class="drawer-input" placeholder="School Name" x-model="sub.sch.name">
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.sch.link" x-show="sub.sch.seen">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.sch.title" x-show="sub.sch.seen">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="phone" x-model="feats.phn"><label for="phone">Phone</label></div>
-                            <template x-if="feats.phn">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Phone Details</strong>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenphn" x-model="sub.phn.seen"><label for="seenphn">As Seen On</label></div>
-                                    <input type="text" class="drawer-input" placeholder="Phone Number" x-model="sub.phn.num">
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.phn.link" x-show="sub.phn.seen">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.phn.title" x-show="sub.phn.seen">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="email" x-model="feats.mail"><label for="email">Email</label></div>
-                            <template x-if="feats.mail">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Email Details</strong>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="usrmai" x-model="sub.mail.usr"><label for="usrmai">Username</label></div>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenmai" x-model="sub.mail.seen"><label for="seenmai">As Seen On</label></div>
-                                    <input type="text" class="drawer-input" placeholder="Email Address" x-model="sub.mail.addr">
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.mail.link" x-show="sub.mail.seen || sub.mail.usr">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.mail.title" x-show="sub.mail.seen || sub.mail.usr">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="naturework" x-model="feats.wrk"><label for="naturework">Nature of Work</label></div>
-                            <template x-if="feats.wrk">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Nature of Work Details</strong>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenwrk" x-model="sub.wrk.seen"><label for="seenwrk">As Seen On</label></div>
-                                    <input type="text" class="drawer-input" placeholder="Nature of Work" x-model="sub.wrk.nat">
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.wrk.link" x-show="sub.wrk.seen">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.wrk.title" x-show="sub.wrk.seen">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="employment" x-model="feats.emp"><label for="employment">Employment</label></div>
-                            <template x-if="feats.emp">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Employment Details</strong>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenemp" x-model="sub.emp.seen"><label for="seenemp">As Seen On</label></div>
-                                    <input type="text" class="drawer-input" placeholder="Company Name" x-model="sub.emp.name">
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.emp.link" x-show="sub.emp.seen">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.emp.title" x-show="sub.emp.seen">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="relative" x-model="feats.rel"><label for="relative">Relative</label></div>
-                            <template x-if="feats.rel">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Relative Details</strong>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenrel" x-model="sub.rel.seen"><label for="seenrel">As Seen On</label></div>
-                                    <input type="text" class="drawer-input" placeholder="Relative Name" x-model="sub.rel.name">
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.rel.link" x-show="sub.rel.seen">
-                                    <input type="text" class="drawer-input" placeholder="Database Name" x-model="sub.rel.title" x-show="sub.rel.seen">
-                                </div>
-                            </template>
+                            <div class="custom-toggle"><input type="checkbox" id="dob1" x-model="feats.dob" @change="if(feats.dob) scrollToDrawer('drawer-dob')"><label for="dob1">Date of Birth</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="age1" x-model="feats.age" @change="if(feats.age) scrollToDrawer('drawer-age')"><label for="age1">Age</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="location" x-model="feats.loc" @change="if(feats.loc) scrollToDrawer('drawer-loc')"><label for="location">Location</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="school" x-model="feats.sch" @change="if(feats.sch) scrollToDrawer('drawer-sch')"><label for="school">School</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="phone" x-model="feats.phn" @change="if(feats.phn) scrollToDrawer('drawer-phn')"><label for="phone">Phone</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="email" x-model="feats.mail" @change="if(feats.mail) scrollToDrawer('drawer-mail')"><label for="email">Email</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="naturework" x-model="feats.wrk" @change="if(feats.wrk) scrollToDrawer('drawer-wrk')"><label for="naturework">Nature of Work</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="employment" x-model="feats.emp" @change="if(feats.emp) scrollToDrawer('drawer-emp')"><label for="employment">Employment</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="relative" x-model="feats.rel" @change="if(feats.rel) scrollToDrawer('drawer-rel')"><label for="relative">Relative</label></div>
                         </div>
 
                         <h3 class="section-heading">2 Points</h3>
                         <div class="identifier-grid">
-                            <div class="custom-toggle"><input type="checkbox" id="visualmatch" x-model="feats.vm"><label for="visualmatch">Visual Match</label></div>
-                            <template x-if="feats.vm">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Visual Match Details</strong>
-                                    <div class="custom-toggle" style="margin-top: 2px;"><input type="checkbox" id="seenvm" x-model="sub.vm.seen"><label for="seenvm">As Seen On</label></div>
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.vm.link" x-show="sub.vm.seen">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.vm.title" x-show="sub.vm.seen">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="username" x-model="feats.user"><label for="username">Username</label></div>
-                            <template x-if="feats.user">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Username Details</strong>
-                                    <input type="text" class="drawer-input" placeholder="Username" x-model="sub.user.txt">
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.user.link">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.user.title">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="linked" x-model="feats.linked"><label for="linked">Linked</label></div>
-                            <template x-if="feats.linked">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Linked Details</strong>
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.linked.link">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.linked.title">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="connections" x-model="feats.conn"><label for="connections">Connections</label></div>
-                            <template x-if="feats.conn">
-                                <div class="details-drawer" x-transition style="flex-direction: column; align-items: flex-start;">
-                                    <strong>Connection Settings</strong>
-                                    
-                                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                        <div class="custom-toggle">
-                                            <input type="checkbox" id="ismtf" x-model="sub.conn.friend" :disabled="sub.conn.following || sub.conn.follower || sub.conn.connected">
-                                            <label for="ismtf">Friend</label>
-                                        </div>
-                                        <div class="custom-toggle">
-                                            <input type="checkbox" id="isfo1" x-model="sub.conn.following" :disabled="sub.conn.friend || sub.conn.follower || sub.conn.connected">
-                                            <label for="isfo1">Following</label>
-                                        </div>
-                                        <div class="custom-toggle">
-                                            <input type="checkbox" id="isfo2" x-model="sub.conn.follower" :disabled="sub.conn.friend || sub.conn.following || sub.conn.connected">
-                                            <label for="isfo2">Follower</label>
-                                        </div>
-                                        <div class="custom-toggle">
-                                            <input type="checkbox" id="iscon" x-model="sub.conn.connected" :disabled="sub.conn.friend || sub.conn.following || sub.conn.follower">
-                                            <label for="iscon">Connected</label>
-                                        </div>
-                                        <div class="custom-toggle">
-                                            <input type="checkbox" id="seencon" x-model="sub.conn.seen" :disabled="(sub.conn.friend && sub.conn.own) || sub.conn.following || sub.conn.follower || sub.conn.connected">
-                                            <label for="seencon">As Seen On</label>
-                                        </div>
-                                        <div class="custom-toggle">
-                                            <input type="checkbox" id="owncon" x-model="sub.conn.own" :disabled="sub.conn.friend && sub.conn.seen">
-                                            <label for="owncon">Own</label>
-                                        </div>
-                                    </div>
-                                    
-                                    <div style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap;">
-                                        <input type="text" class="drawer-input" placeholder="Platform (e.g. FB, IG)" x-model="sub.conn.net" :disabled="sub.conn.own || sub.conn.friend">
-                                        <input type="text" class="drawer-input" placeholder="Platform Hyperlink" x-model="sub.conn.netL" :disabled="sub.conn.own || sub.conn.friend">
-                                        
-                                        <input type="text" class="drawer-input" placeholder="Their Connection" x-model="sub.conn.id" :disabled="sub.conn.own || sub.conn.friend">
-                                        <input type="text" class="drawer-input" placeholder="Connection Link 1" x-model="sub.conn.link1" :disabled="sub.conn.own || sub.conn.friend">
-                                        
-                                        <input type="text" class="drawer-input" placeholder="Connection Name" x-model="sub.conn.name" :disabled="sub.conn.own">
-                                        <input type="text" class="drawer-input" placeholder="Connection Link 2" x-model="sub.conn.link2" :disabled="sub.conn.own">
-                                    </div>
-                                    
-                                    <div style="display: flex; gap: 10px; width: 100%; flex-wrap: wrap;" x-show="sub.conn.seen || sub.conn.own">
-                                        <input type="text" class="drawer-input" placeholder="Identified Network Link" x-model="sub.conn.accLink" :disabled="!sub.conn.own && (sub.conn.following || sub.conn.follower || sub.conn.connected)">
-                                        <input type="text" class="drawer-input" placeholder="Identified Network Name" x-model="sub.conn.title" :disabled="!sub.conn.own && (sub.conn.following || sub.conn.follower || sub.conn.connected)">
-                                    </div>
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="same" x-model="feats.same"><label for="same">Same</label></div>
-                            <template x-if="feats.same">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Same Object Details</strong>
-                                    <input type="text" class="drawer-input" placeholder="What Object?" x-model="sub.same.obj">
-                                    <input type="text" class="drawer-input" placeholder="Object Link" x-model="sub.same.link1">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.same.net">
-                                    <input type="text" class="drawer-input" placeholder="Network Link" x-model="sub.same.link2">
-                                </div>
-                            </template>
-
-                            <div class="custom-toggle"><input type="checkbox" id="visualmatch2" x-model="feats.loc2"><label for="visualmatch2">Exact Location</label></div>
-                            <template x-if="feats.loc2">
-                                <div class="details-drawer" x-transition>
-                                    <strong>Exact Location Details</strong>
-                                    <input type="text" class="drawer-input" placeholder="Hyperlink" x-model="sub.loc2.link">
-                                    <input type="text" class="drawer-input" placeholder="Network Name" x-model="sub.loc2.title">
-                                </div>
-                            </template>
+                            <div class="custom-toggle"><input type="checkbox" id="visualmatch" x-model="feats.vm" @change="if(feats.vm) scrollToDrawer('drawer-vm')"><label for="visualmatch">Visual Match</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="username" x-model="feats.user" @change="if(feats.user) scrollToDrawer('drawer-user')"><label for="username">Username</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="linked" x-model="feats.linked" @change="if(feats.linked) scrollToDrawer('drawer-linked')"><label for="linked">Linked</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="connections" x-model="feats.conn" @change="if(feats.conn) scrollToDrawer('drawer-conn')"><label for="connections">Connections</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="same" x-model="feats.same" @change="if(feats.same) scrollToDrawer('drawer-same')"><label for="same">Same</label></div>
+                            <div class="custom-toggle"><input type="checkbox" id="visualmatch2" x-model="feats.loc2" @change="if(feats.loc2) scrollToDrawer('drawer-loc2')"><label for="visualmatch2">Exact Location</label></div>
                         </div>
 
                         <h3 class="section-heading">Custom</h3>
                         <div class="identifier-grid">
-                            <div class="custom-toggle"><input type="checkbox" id="custom" x-model="feats.custom"><label for="custom">Enable Custom</label></div>
-                            
-                            <template x-if="feats.custom">
-                                <div class="details-drawer custom-drawer" x-transition>
-                                    <strong>Custom Identifiers</strong>
-                                    <input type="text" class="drawer-input" placeholder="Custom Identifier 1" x-model="sub.custom[0]">
-                                    <input type="text" class="drawer-input" placeholder="Custom Identifier 2" x-model="sub.custom[1]">
-                                    <input type="text" class="drawer-input" placeholder="Custom Identifier 3" x-model="sub.custom[2]">
-                                    <input type="text" class="drawer-input" placeholder="Custom Identifier 4" x-model="sub.custom[3]">
-                                    <input type="text" class="drawer-input" placeholder="Custom Identifier 5" x-model="sub.custom[4]">
-                                </div>
-                            </template>
+                            <div class="custom-toggle"><input type="checkbox" id="custom" x-model="feats.custom" @change="if(feats.custom) scrollToDrawer('drawer-custom')"><label for="custom">Enable Custom</label></div>
                         </div>
 
                     </div>
 
-    <div class="slider-controls">
+                    <div class="slider-controls">
                         <button class="slider-btn" @click="step--">⬅ Previous</button>
                         <button class="slider-btn primary" @click="
                             document.getElementById('final-output').innerHTML = reportEngine;
@@ -721,6 +860,7 @@
 
                     <div class="slider-controls">
                         <button class="slider-btn" @click="step--; isEditing = false;">⬅ Edit Identifiers</button>
+                    
                         
                         <button class="slider-btn" 
                                 @click="isEditing = !isEditing"
@@ -749,6 +889,11 @@
                                 setTimeout(() => { btn.innerHTML = originalText; btn.style.backgroundColor = ''; }, 2000);
                             });
                         ">Copy Template</button>
+
+                        <button class="slider-btn primary" 
+                                @click="document.getElementById('final-output').innerHTML = reportEngine; isEditing = false;">
+                            ↻ Update
+                        </button>
                     </div>
                 </div>
             </div>
