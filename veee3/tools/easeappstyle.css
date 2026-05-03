@@ -750,3 +750,54 @@ input[type="checkbox"]:disabled {
 }
 
 .sub-rows-container { margin-top: 5px; }
+
+/* Make the inline toolbar compact and grouped */
+.custom-text-input .ql-toolbar.ql-snow {
+    padding: 4px 8px;
+    border: none;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;        
+    align-items: center;
+    gap: 10px; /* Space between the Link button and the Undo/Redo buttons */
+}
+
+/* Tidy up the format groups so they don't spread out */
+.custom-text-input .ql-toolbar.ql-snow .ql-formats {
+    margin: 0; 
+    display: flex;
+    gap: 4px;
+}
+
+/* Refine button sizing and add a smooth hover */
+.custom-text-input .ql-toolbar.ql-snow button {
+    width: 24px;
+    height: 24px;
+    padding: 2px;
+    border-radius: 4px;
+    transition: background 0.2s;
+}
+
+.custom-text-input .ql-toolbar.ql-snow button:hover {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+/* Invert the toolbar icons to white */
+.custom-text-input .ql-snow .ql-stroke {
+    stroke: rgba(255, 255, 255, 0.8);
+}
+.custom-text-input .ql-snow .ql-fill {
+    fill: rgba(255, 255, 255, 0.8);
+}
+
+/* Placeholder and text color fixes */
+.custom-text-input .ql-editor.ql-blank::before {
+    color: rgba(255, 255, 255, 0.6);
+    font-style: normal;
+    left: 8px;
+}
+.custom-text-input .ql-editor {
+    color: #e0e0e0;
+    padding: 8px;
+    min-height: 40px;
+}
